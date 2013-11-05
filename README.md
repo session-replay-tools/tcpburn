@@ -55,7 +55,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	make
 	make install
 	
-	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> -s <intercept address>-u <user num> -c <ip range,>
+	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> -s <intercept address> -u <user num> -c <ip range,>
 	
 	比如：
 	
@@ -130,7 +130,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	make
 	make install
 	
-	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> -s <intercept address>-u <user num> -c <ip range,>
+	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> -s <intercept address> -u <user num> -c <ip range,>
 	
 	比如：
 	
