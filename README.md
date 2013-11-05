@@ -44,7 +44,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 ###2）下载编译运行gryphon：
 
 	git clone git://github.com/wangbin579/gryphon.git
-	cd tcpcopy
+	cd gryphon
 	sh autogen.sh
 	
 	如果是非comet应用：
