@@ -102,19 +102,19 @@ Gryphon是由网易自主开发的能够模拟千万级别并发用户的一个�
 
 ###2）在测试服务器设置路由信息：
 
-On the test server which runs test server applications (root privilege is required):
-    Set route command appropriately to route response packets to the assistant server
-
-    For example:
-
-    Assume 61.135.233.219 is the actual IP address which is the default gateway, while 
-    61.135.233.161 is the IP address of the assistant server. We set the following route 
-    commands to route all extenal responses to the assistant server.
-
-       route del default gw 61.135.233.219
-       route add default gw 61.135.233.161
-
-	如果是comet应用，那么应该确保publish主题的ip地址的访问，其响应不能路由到辅助服务器中去
+	On the test server which runs test server applications (root privilege is required):
+	  Set route command appropriately to route response packets to the assistant server
+	
+	  For example:
+	
+	  Assume 61.135.233.219 is the actual IP address which is the default gateway, while 
+	  61.135.233.161 is the IP address of the assistant server. We set the following route 
+	  commands to route all extenal responses to the assistant server.
+	
+	  route del default gw 61.135.233.219
+	  route add default gw 61.135.233.161
+	
+	  如果是comet应用，那么应该确保publish主题的ip地址的访问，其响应不能路由到辅助服务器中去
 
 ###3）下载编译运行gryphon：
 
@@ -145,7 +145,7 @@ On the test server which runs test server applications (root privilege is requir
 	2）-s参数指定intercept所在机器的地址，一般只需指定ip地址即可
 	3）-f文件，用来指定需要回放的pcap文件，要确保此文件尽可能完整，而且不丢包
 	4）对于消息推送服务，需要确保有IP地址能够publish主题（比如内网ip地址来publish主题，外网ip地址来供模拟客户端用户来访问，外网的访问，其响应走辅助服务器）
-	5）gryphon定义的一个用户，就是一个连接的会话，从pcap文件中提取，所以用户构造会话会话过程，要注意连接的特性。
+	5）gryphon定义的一个用户，就是一个连接的会话，从pcap文件中提取，所以用户构造会话过程，要注意连接的特性。
 	6）对于pcap文件，还可以采用-F参数来过滤。
 	7）对于comet应用，pcap文件最好不要包含publish的请求
 	8）更多信息还可以见-h命令
