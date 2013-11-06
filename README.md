@@ -5,6 +5,14 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 
 值得注意的是，Gryphon架构类似于tcpcopy，也可以采用传统使用方式和高级使用方式。
 
+#特性
+	1)无需绑定多个ip地址
+	2)客户端可使用的ip地址个数不受限制
+	3)并发用户数量不受os的限制
+	4)只要是可回放的协议,一般都支持
+	5)可支持的最大并发用户数,取决于该机器的带宽,cpu和内存
+	6)所使用的会话数据均从pcap文件中抽取,可以保持在线的多种特性
+
 #下载地址：
 
 ###intercept程序
@@ -39,12 +47,12 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
         iptables -I OUTPUT -p tcp --sport port -j NFQUEUE # if not set
         ./intercept
 
-	如果是comet应用，那么应该在intercept设置-x参数，设置可以访问测试服务器的IP地址，以便让这个ip地址来publish主题
+	如果是comet应用，那么应该在intercept设置-x参数，设置可以访问测试服务器的ip地址，以便让这个ip地址来publish主题
 
 ###2）下载编译运行gryphon：
 
 	git clone git://github.com/wangbin579/gryphon.git
-	cd tcpcopy
+	cd gryphon
 	sh autogen.sh
 	
 	如果是非comet应用：
@@ -61,12 +69,11 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	
 	./gryphon -x 18081-61.xxx.xxx.217:8001 -f /home/wangbin/work/github/161_18081.pcap -s 10.yyy.yyy.217 -u 10000 -c 62.135.200.*
 	
-	从/home/wangbin/161_18081.pcap抓包文件中提取出访问18081端口的用户会话过程，复制到61.xxx.xxx.217服务器的8001端口中去，
-	其中模拟的用户数量为10000个用户，ip地址范围为62.135.200.*系列,intercept所在的机器ip地址为10.yyy.yyy.217
+	从/home/wangbin/161_18081.pcap抓包文件中提取出访问18081端口的用户会话过程，复制到61.xxx.xxx.217服务器的8001端口中去，其中模拟的用户数量为10000个用户，ip地址范围为62.135.200.*系列,intercept所在的机器ip地址为10.yyy.yyy.217
 
 ###传统使用方式注意事项：
 
-	1）-c参数指定的ip地址范围，目前只能是最后一个为‘*'，如果需要多个网段的ip地址，则采用‘，’隔开
+	1）-c参数指定的ip地址范围，目前只能是最后一个为‘*'，如果需要多个网段的ip地址，则采用‘,’隔开
 	2）-s参数指定intercept所在机器的地址，一般只需指定ip地址即可
 	3）-f文件，用来指定需要回放的pcap文件，要确保此文件尽可能完整，而且不丢包
 	4）对于消息推送服务，需要用不同于targetServerIP的方式来访问（比如内网ip地址来publish主题，外网ip地址来供模拟客户端用户来访问），并设置intercept的-x参数
@@ -119,7 +126,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 ###3）下载编译运行gryphon：
 
 	git clone git://github.com/wangbin579/gryphon.git
-	cd tcpcopy
+	cd gryphon
 	sh autogen.sh
 	
 	如果是非comet应用：
@@ -136,15 +143,14 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	
 	./gryphon -x 18081-61.xxx.xxx.217:8001 -f /home/wangbin/work/github/161_18081.pcap -s 10.yyy.yyy.208 -u 10000 -c 62.135.200.*
 	
-	从/home/wangbin/161_18081.pcap抓包文件中提取出访问18081端口的用户会话过程，复制到61.xxx.xxx.217服务器的8001端口中去，
-	其中模拟的用户数量为10000个用户，ip地址范围为62.135.200.*系列,intercept所在的机器ip地址为10.yyy.yyy.208
+	从/home/wangbin/161_18081.pcap抓包文件中提取出访问18081端口的用户会话过程，复制到61.xxx.xxx.217服务器的8001端口中去，其中模拟的用户数量为10000个用户，ip地址范围为62.135.200.*系列,intercept所在的机器ip地址为10.yyy.yyy.208
 
 ###高级使用方式注意事项：
 	
-	1）-c参数指定的ip地址范围，目前只能是最后一个为‘*'，如果需要多个网段的ip地址，则采用‘，’隔开
+	1）-c参数指定的ip地址范围，目前只能是最后一个为‘*'，如果需要多个网段的ip地址，则采用‘,’隔开
 	2）-s参数指定intercept所在机器的地址，一般只需指定ip地址即可
 	3）-f文件，用来指定需要回放的pcap文件，要确保此文件尽可能完整，而且不丢包
-	4）对于消息推送服务，需要确保有IP地址能够publish主题（比如内网ip地址来publish主题，外网ip地址来供模拟客户端用户来访问，外网的访问，其响应走辅助服务器）
+	4）对于消息推送服务，需要确保有ip地址能够publish主题（比如内网ip地址来publish主题，外网ip地址来供模拟客户端用户来访问，外网的访问，其响应走辅助服务器）
 	5）gryphon定义的一个用户，就是一个连接的会话，从pcap文件中提取，所以用户构造会话过程，要注意连接的特性。
 	6）对于pcap文件，还可以采用-F参数来过滤。
 	7）对于comet应用，pcap文件最好不要包含publish的请求
