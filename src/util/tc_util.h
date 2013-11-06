@@ -28,10 +28,5 @@ unsigned char *
 get_ip_data(pcap_t *pcap, unsigned char *frame, const int pkt_len, 
         int *p_l2_len);
 
-#if (GRYPHON_PCAP_SEND)
-inline void fill_frame(struct ethernet_hdr *hdr, 
-        unsigned char *smac, unsigned char *dmac);
-#endif
-
 #endif   /* ----- #ifndef TC_UTIL_INCLUDED  ----- */
 

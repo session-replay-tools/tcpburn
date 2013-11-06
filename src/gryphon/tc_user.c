@@ -463,7 +463,7 @@ static bool send_stop(tc_user_t *u)
     return false;
 }
 
-#if (GRYPHON_SINGLE)
+#if (!GRYPHON_SINGLE)
 static bool
 send_router_info(tc_user_t *u, uint16_t type)
 {
@@ -584,6 +584,16 @@ update_timestamp(tc_user_t *u, tc_tcp_header_t *tcp_header)
     return;
 }
 
+#if (GRYPHON_PCAP_SEND)
+static void
+fill_frame(struct ethernet_hdr *hdr, unsigned char *smac, unsigned char *dmac)
+{
+    memcpy(hdr->ether_shost, smac, ETHER_ADDR_LEN);
+    memcpy(hdr->ether_dhost, dmac, ETHER_ADDR_LEN);
+    hdr->ether_type = htons(ETH_P_IP); 
+}
+#endif
+
 static bool process_packet(tc_user_t *u, unsigned char *frame) 
 {
     bool                    result;
@@ -645,7 +655,7 @@ static bool process_packet(tc_user_t *u, unsigned char *frame)
     packs_sent_cnt++;
     if (tcp_header->syn) {
         syn_sent_cnt++;
-#if (GRYPHON_SINGLE)
+#if (!GRYPHON_SINGLE)
         if (!send_router_info(u, CLIENT_ADD)) {
             return false;
         }
@@ -1076,16 +1086,6 @@ void process_outgress(unsigned char *packet)
     }
 
 }
-
-#if (GRYPHON_PCAP_SEND)
-void
-fill_frame(struct ethernet_hdr *hdr, unsigned char *smac, unsigned char *dmac)
-{
-    memcpy(hdr->ether_shost, smac, ETHER_ADDR_LEN);
-    memcpy(hdr->ether_dhost, dmac, ETHER_ADDR_LEN);
-    hdr->ether_type = htons(ETH_P_IP); 
-}
-#endif
 
 
 

@@ -74,6 +74,11 @@ typedef struct tc_user_s {
     uint32_t srv_window;
     uint32_t total_packets_sent;
 
+#if (GRYPHON_PCAP_SEND)
+    unsigned char *src_mac;
+    unsigned char *dst_mac;
+#endif
+
     session_data_t *orig_session;
     frame_t        *orig_frame;
     frame_t        *orig_unack_frame;

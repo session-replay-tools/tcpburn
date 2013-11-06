@@ -181,13 +181,3 @@ get_ip_data(pcap_t *pcap, unsigned char *frame, const int pkt_len,
 
 }
 
-#if (GRYPHON_PCAP_SEND)
-inline void
-fill_frame(struct ethernet_hdr *hdr, unsigned char *smac, unsigned char *dmac)
-{
-    memcpy(hdr->ether_shost, smac, ETHER_ADDR_LEN);
-    memcpy(hdr->ether_dhost, dmac, ETHER_ADDR_LEN);
-    hdr->ether_type = htons(ETH_P_IP); 
-}
-#endif
-
