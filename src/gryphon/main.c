@@ -609,8 +609,8 @@ set_details()
             clt_settings.par_connections);
 
     if (clt_settings.raw_pcap_files == NULL) {
-        tc_log_info(LOG_ERR, 0, "it must have -i argument for gryphon");
-        fprintf(stderr, "no -i argument\n");
+        tc_log_info(LOG_ERR, 0, "it must have -f argument for gryphon");
+        fprintf(stderr, "no -f argument\n");
         return -1;
     }
 
@@ -737,13 +737,6 @@ main(int argc, char **argv)
     if (set_details() == -1) {
         return -1;
     }
-
-#if (GRYPHON_MYSQL_ADVANCED) 
-    tc_init_digests();
-    if (!tc_init_sha1()) {
-        return -1;
-    }
-#endif
 
     if (set_timer() == -1) {
         return -1;
