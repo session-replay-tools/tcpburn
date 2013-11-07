@@ -60,6 +60,7 @@ typedef struct xcopy_clt_settings {
     char         *filter;          
     tc_pcap_file  pcap_files[MAX_PCAP_FILES]; 
     int           num_pcap_files;       
+    int           conn_init_sp_fact;
     long          pcap_time;
     pcap_t       *pcap;
     uint64_t      interval;             /* accelerated times */

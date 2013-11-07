@@ -65,6 +65,7 @@ usage(void)
     printf("-M <num>       MTU value sent to backend (default 1500)\n");
     printf("-u <num>       concurrent users\n");
     printf("-c <ip,>       client ips\n");
+    printf("-i <num>       connection init speed fact(default 1024 connectins per second)\n");
     printf("-S <num>       MSS value sent back(default 1460)\n");
     printf("-C <num>       parallel connections between gryphon and intercept.\n"
            "               The maximum value allowed is 16(default 3 connections since 0.8.0)\n");
@@ -101,6 +102,7 @@ read_args(int argc, char **argv)
          "c:" /* client ip list */
          "a:" /* accelerated times */
          "I:" /* threshold interval time for acceleratation */
+         "i:" 
 #if (GRYPHON_PCAP_SEND)
          "o:" /* <device,> */
 #endif
@@ -137,6 +139,9 @@ read_args(int argc, char **argv)
                 break;
             case 'I':
                 clt_settings.interval = atoi(optarg);
+                break;
+            case 'i':
+                clt_settings.conn_init_sp_fact = atoi(optarg);
                 break;
 #if (GRYPHON_PCAP_SEND)
             case 'o':
@@ -627,6 +632,12 @@ set_details()
         clt_settings.interval = clt_settings.interval * 1000;
     }
 
+    if (clt_settings.conn_init_sp_fact == 0) {
+        clt_settings.conn_init_sp_fact = DEFAULT_CONN_INIT_SP_FACT;
+    }
+    tc_log_info(LOG_NOTICE, 0, "init connections speed:%d", 
+            clt_settings.conn_init_sp_fact);
+
 #if (GRYPHON_PCAP_SEND)
     if (clt_settings.output_if_name != NULL) {
         tc_log_info(LOG_NOTICE, 0, "output device:%s", 
@@ -668,6 +679,7 @@ settings_init()
     /* init values */
     clt_settings.users = 0;
     clt_settings.mtu = DEFAULT_MTU;
+    clt_settings.conn_init_sp_fact = DEFAULT_CONN_INIT_SP_FACT;
     clt_settings.mss = DEFAULT_MSS;
     clt_settings.srv_port = SERVER_PORT;
     clt_settings.par_connections = 3;

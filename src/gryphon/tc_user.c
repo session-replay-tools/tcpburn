@@ -189,7 +189,7 @@ tc_retrieve_session(uint64_t key)
 static tc_user_t *
 tc_retrieve_active_user()
 {
-    int        total;
+    int        total, speed;
     time_t     cur;
     tc_user_t *u; 
 
@@ -208,11 +208,12 @@ tc_retrieve_active_user()
            base_user_seq = 1;
         } else {
             u = user_array + total;
-            relative_user_seq = (relative_user_seq + 1) % 1024;
+            speed = clt_settings.conn_init_sp_fact;
+            relative_user_seq = (relative_user_seq + 1) % speed;
 
             if (relative_user_seq == 0) {
                 if (record_time != cur) {
-                    base_user_seq += 1024;
+                    base_user_seq += speed;
                     record_time = cur;
                     tc_log_info(LOG_NOTICE, 0, "change record time");
                     total = total + 1;

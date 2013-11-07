@@ -56,6 +56,8 @@
 /* default listening port for intercept */
 #define SERVER_PORT   36524
 
+#define DEFAULT_CONN_INIT_SP_FACT 1024
+
 #define MAX_REAL_SERVERS 256
 #define MAX_PCAP_FILES 1024
 
