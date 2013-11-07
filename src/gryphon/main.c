@@ -632,7 +632,7 @@ set_details()
         clt_settings.interval = clt_settings.interval * 1000;
     }
 
-    if (clt_settings.conn_init_sp_fact == 0) {
+    if (clt_settings.conn_init_sp_fact <= 0) {
         clt_settings.conn_init_sp_fact = DEFAULT_CONN_INIT_SP_FACT;
     }
     tc_log_info(LOG_NOTICE, 0, "init connections speed:%d", 
