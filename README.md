@@ -24,6 +24,14 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	git clone git://github.com/wangbin579/gryphon.git
 
 
+#Gryphon configure Options
+    --enable-debug      compile Gryphon with debug support (saved in a log file)
+    --enable-advanced   run Gryphon at advanced mode (advanced archecture) 
+    --enable-dlinject   send packets at the data link layer instead of the IP layer
+    --enable-single     单一实例运行方式（跟intercept一一对应），适合于高效使用
+    --enable-comet      消息推送模式
+
+
 #传统使用
 
 ###1）下载编译运行intercept（运行类似于tcpcopy的intercept）：
@@ -81,7 +89,8 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	6）采用传统方式，一定要确保ip queue或者nfqueue不丢包
 	7）对于pcap文件，还可以采用-F参数来过滤。
 	8）对于comet应用，pcap文件最好不要包含publish的请求
-	9）更多信息还可以见-h命令
+	9）默认采用raw socket发包，这时候需要关闭ip_conntrack模块或者采用pcap发包（"--enable-dlinject"）
+	10）更多信息还可以见-h命令
 
 #高级使用方式
 
@@ -154,5 +163,6 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	5）gryphon定义的一个用户，就是一个连接的会话，从pcap文件中提取，所以用户构造会话过程，要注意连接的特性。
 	6）对于pcap文件，还可以采用-F参数来过滤。
 	7）对于comet应用，pcap文件最好不要包含publish的请求
-	8）更多信息还可以见-h命令
+	8）默认采用raw socket发包，这时候需要关闭ip_conntrack模块或者采用pcap发包（"--enable-dlinject"）
+	9）更多信息还可以见-h命令
 
