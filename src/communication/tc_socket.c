@@ -121,7 +121,7 @@ tc_raw_socket_send(int fd, void *buf, size_t len, uint32_t ip)
                 if (errno == EINTR) {
                     tc_log_info(LOG_NOTICE, errno, "raw fd:%d EINTR", fd);
                 } else if (errno == EAGAIN) {
-                    tc_log_info(LOG_NOTICE, errno, "raw fd:%d EAGAIN", fd);
+                    tc_log_debug1(LOG_NOTICE, errno, "raw fd:%d EAGAIN", fd);
                 } else {
                     tc_log_info(LOG_ERR, errno, "raw fd:%d", fd);
                     tc_socket_close(fd);
