@@ -334,7 +334,7 @@ tc_socket_send(int fd, char *buffer, int len)
             if (errno == EINTR) {
                 tc_log_info(LOG_NOTICE, errno, "fd:%d EINTR", fd);
             } else if (errno == EAGAIN) {
-                tc_log_info(LOG_NOTICE, errno, "fd:%d EAGAIN", fd);
+                tc_log_debug1(LOG_NOTICE, errno, "fd:%d EAGAIN", fd);
             } else {
                 tc_log_info(LOG_ERR, errno, "fd:%d", fd);
                 return TC_ERROR;
