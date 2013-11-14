@@ -2,25 +2,26 @@
 #include <xcopy.h>
 #include <tc_user.h>
 
-static bool    init_phase  = true;
-static time_t  record_time = 0;
-static int handshake_cnt   = 0;
-static int size_of_user_index = 0;
-static int size_of_users      = 0;
-static int base_user_seq      = 0;
-static int relative_user_seq  = 0;
+static bool    init_phase       = true;
+static time_t  record_time      = 0;
 
-static uint64_t fin_sent_cnt  = 0;
-static uint64_t rst_sent_cnt  = 0;
-static uint64_t conn_cnt      = 0;
-static uint64_t rst_recv_cnt  = 0;
-static uint64_t fin_recv_cnt  = 0;
-static uint64_t resp_cnt      = 0; 
-static uint64_t resp_cont_cnt = 0;
-static uint64_t active_conn_cnt    = 0;
-static uint64_t syn_sent_cnt       = 0;
-static uint64_t packs_sent_cnt     = 0; 
-static uint64_t cont_sent_cnt      = 0; 
+static int size_of_user_index   = 0;
+static int size_of_users        = 0;
+static int base_user_seq        = 0;
+static int relative_user_seq    = 0;
+
+static uint64_t fin_sent_cnt    = 0;
+static uint64_t rst_sent_cnt    = 0;
+static uint64_t conn_cnt        = 0;
+static uint64_t conn_reject_cnt = 0;
+static uint64_t rst_recv_cnt    = 0;
+static uint64_t fin_recv_cnt    = 0;
+static uint64_t resp_cnt        = 0; 
+static uint64_t resp_cont_cnt   = 0;
+static uint64_t active_conn_cnt = 0;
+static uint64_t syn_sent_cnt    = 0;
+static uint64_t packs_sent_cnt  = 0; 
+static uint64_t cont_sent_cnt   = 0; 
 static uint64_t orig_clt_packs_cnt = 0; 
 
 static tc_user_index_t  *user_index_array = NULL;
@@ -1035,7 +1036,6 @@ void process_outgress(unsigned char *packet)
                 conn_cnt++;
                 active_conn_cnt++;
                 u->state.resp_syn_received = 1;
-                handshake_cnt++;
                 u->state.status |= SYN_CONFIRM;
                 tc_log_debug2(LOG_DEBUG, 0, "exp ack seq:%u, p:%u",
                         ntohl(u->exp_ack_seq), ntohs(u->src_port));
@@ -1067,9 +1067,10 @@ void process_outgress(unsigned char *packet)
         } else if (tcp_header->rst) {
             tc_log_info(LOG_NOTICE, 0, "recv rst from back:%u", 
                     ntohs(u->src_port));
+            rst_recv_cnt++;
             if (u->state.status == SYN_SENT) {
                 if (!u->state.over) {
-                    rst_recv_cnt++;
+                    conn_reject_cnt++;
                 }
             }
             if (!u->state.over) {
@@ -1105,8 +1106,8 @@ void
 output_stat()
 {
     tc_log_info(LOG_NOTICE, 0, "active conns:%llu", active_conn_cnt);
-    tc_log_info(LOG_NOTICE, 0, "reset recv:%llu,fin recv:%llu",
-            rst_recv_cnt, fin_recv_cnt);
+    tc_log_info(LOG_NOTICE, 0, "reject:%llu, reset recv:%llu,fin recv:%llu",
+            conn_reject_cnt, rst_recv_cnt, fin_recv_cnt);
     tc_log_info(LOG_NOTICE, 0, "reset sent:%llu, fin sent:%llu",
             rst_sent_cnt, fin_sent_cnt);
     tc_log_info(LOG_NOTICE, 0, "conns:%llu,resp packs:%llu,c-resp packs:%llu",
