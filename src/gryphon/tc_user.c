@@ -321,7 +321,7 @@ tc_build_users(int port_prioritized, int num_users, uint32_t *ips, int num_ip)
         for ( i = 0; i < num_ip; i++) {
             ip = ips[i];
 
-            for (j = FIRST_PORT; j < 65536; j++) {
+            for (j = FIRST_PORT; j <= LAST_PORT; j++) {
                 port = htons(j);
                 key = tc_get_key(ip, port);
                 if (count >= size_of_users) {
@@ -340,7 +340,7 @@ tc_build_users(int port_prioritized, int num_users, uint32_t *ips, int num_ip)
             }
         }
     } else {
-        for (j = FIRST_PORT; j < 65536; j++) {
+        for (j = FIRST_PORT; j <= LAST_PORT; j++) {
             port = htons(j);
             for ( i = 0; i < num_ip; i++) {
                 ip = ips[i];
