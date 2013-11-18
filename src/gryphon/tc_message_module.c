@@ -85,11 +85,10 @@ tc_process_server_msg(tc_event_t *rev)
             }
         }
 
-
         if (clt_settings.real_servers.active_num == 0) {
             tc_over = SIGRTMAX;
-            return TC_OK;
         }
+        return TC_OK;
     }
 
     tc_log_debug1(LOG_DEBUG, 0, "resp packets:%d", num);

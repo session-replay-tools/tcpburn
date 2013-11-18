@@ -682,7 +682,7 @@ settings_init()
     clt_settings.conn_init_sp_fact = DEFAULT_CONN_INIT_SP_FACT;
     clt_settings.mss = DEFAULT_MSS;
     clt_settings.srv_port = SERVER_PORT;
-    clt_settings.par_connections = 3;
+    clt_settings.par_connections = 2;
     clt_settings.client_mode = 0;
     clt_settings.session_timeout = DEFAULT_SESSION_TIMEOUT;
     

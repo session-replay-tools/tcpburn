@@ -9,8 +9,9 @@ typedef struct frame_s {
     uint32_t seq;
     struct frame_s *next;
     struct frame_s *prev;
-    unsigned int belong_to_the_same_req:1;
-    unsigned char frame[DEFAULT_MTU + ETHERNET_HDR_LEN];
+    unsigned int    belong_to_the_same_req:1;
+    unsigned int    frame_len:17;
+    unsigned char  *frame_data;
 }frame_t;
 
 typedef struct session_data_s {

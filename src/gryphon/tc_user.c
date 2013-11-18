@@ -714,14 +714,14 @@ static bool process_packet(tc_user_t *u, unsigned char *frame)
 static
 void process_user_packet(tc_user_t *u)
 {
-    unsigned char   frame[DEFAULT_MTU + ETHERNET_HDR_LEN];
+    unsigned char   frame[MAX_FRAME_LENGTH];
 
     if (send_stop(u)) {
         return;
     }
 
     while (true) {
-        memcpy(frame, u->orig_frame->frame, DEFAULT_MTU + ETHERNET_HDR_LEN);
+        memcpy(frame, u->orig_frame->frame_data, u->orig_frame->frame_len);
         process_packet(u, frame);
         u->total_packets_sent++;
         u->orig_frame = u->orig_frame->next;
@@ -829,12 +829,12 @@ fast_retransmit(tc_user_t *u, uint32_t cur_ack_seq)
         if (unack_frame->seq == cur_ack_seq) {
             tc_log_debug1(LOG_DEBUG, 0, "packets retransmitted:%u", 
                     ntohs(u->src_port));
-            process_packet(u, unack_frame->frame);
+            process_packet(u, unack_frame->frame_data);
             break;
         } else if (before(unack_frame->seq, cur_ack_seq) && next != NULL &&
                 before(cur_ack_seq, next->seq)) 
         {
-            process_packet(u, unack_frame->frame);
+            process_packet(u, unack_frame->frame_data);
             break;
         } else if (before(unack_frame->seq, cur_ack_seq)) {
             unack_frame = next;

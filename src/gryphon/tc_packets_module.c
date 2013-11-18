@@ -16,6 +16,20 @@ static void tc_process_packets(tc_event_timer_t *evt);
 static uint64_t timeval_diff(struct timeval *start, struct timeval *cur);
 
 
+static unsigned char *alloc_pool_mem(int length)
+{
+    unsigned char *p;
+
+    p = clt_settings.mem_pool + clt_settings.mem_pool_index;
+    clt_settings.mem_pool_index += length;
+
+    if (clt_settings.mem_pool_index >= clt_settings.mem_pool_size) {
+        tc_log_info(LOG_ERR, 0, "pool full, calloc error for frame data");
+        return NULL;
+    }
+    return p;
+}
+
 static void append_by_order(session_data_t *s, frame_t *added_frame)
 {
     bool     last_changed = true;
@@ -67,7 +81,12 @@ record_packet(uint64_t key, unsigned char *frame, int frame_len, uint32_t seq,
             tc_log_info(LOG_WARN, 0, "calloc error for frame_t");
             return;
         }
-        memcpy(fr->frame, frame, frame_len);
+        fr->frame_data = alloc_pool_mem(frame_len);
+        if (fr->frame_data == NULL) {
+            return;
+        }
+        memcpy(fr->frame_data, frame, frame_len);
+        fr->frame_len = frame_len;
 
         fr->seq = seq;
         entry = (p_session_entry) calloc(1, sizeof(session_entry_t));
@@ -111,7 +130,12 @@ record_packet(uint64_t key, unsigned char *frame, int frame_len, uint32_t seq,
                 tc_log_info(LOG_WARN, 0, "calloc error for fr");
                 return;
             }
-            memcpy(fr->frame, frame, frame_len);
+            fr->frame_data = alloc_pool_mem(frame_len);
+            if (fr->frame_data == NULL) {
+                return;
+            }
+            memcpy(fr->frame_data, frame, frame_len);
+            fr->frame_len = frame_len;
             fr->seq = seq;
 
             append_by_order(session, fr);
@@ -393,4 +417,66 @@ read_packets_from_pcap(char *pcap_file, char *filter)
             packets_cnt, packets_considered_cnt);
     
 }
+
+void 
+calculate_pcap_content_for_pool(char *pcap_file, char *filter)
+{
+    int                 l2_len;
+    char                ebuf[PCAP_ERRBUF_SIZE];
+    bool                stop = false;
+    pcap_t             *pcap;
+    unsigned char      *pkt_data,*ip_data;
+    struct bpf_program  fp;
+    struct pcap_pkthdr  pkt_hdr;  
+
+
+    if ((pcap = pcap_open_offline(pcap_file, ebuf)) == NULL) {
+        tc_log_info(LOG_ERR, 0, "open %s" , ebuf);
+        return;
+    }
+
+    if (filter != NULL) {
+        if (pcap_compile(pcap, &fp, filter, 0, 0) == -1) {
+            tc_log_info(LOG_ERR, 0, "couldn't parse filter %s: %s", 
+                    filter, pcap_geterr(pcap));
+            return;
+        }   
+        if (pcap_setfilter(pcap, &fp) == -1) {
+            fprintf(stderr, "Couldn't install filter %s: %s\n",
+                    filter, pcap_geterr(pcap));
+            return;
+        }
+    }
+
+    while (!stop) {
+
+        pkt_data = (u_char *) pcap_next(pcap, &pkt_hdr);
+        if (pkt_data != NULL) {
+
+            if (pkt_hdr.caplen < pkt_hdr.len) {
+
+                tc_log_info(LOG_WARN, 0, "truncated packets,drop");
+            } else {
+
+                ip_data = get_ip_data(pcap, pkt_data, pkt_hdr.len, &l2_len);
+                if (l2_len < ETHERNET_HDR_LEN) {
+                    tc_log_info(LOG_WARN, 0, "l2 len is %d", l2_len);
+                    continue;
+                }
+
+                if (ip_data != NULL) {
+                    clt_settings.mem_pool_size += pkt_hdr.len;
+                }
+            }
+        } else {
+
+            stop = true;
+            tc_log_info(LOG_NOTICE, 0, "read over from file:%s", pcap_file);
+            read_pcap_over_time = tc_time();
+        }
+    }
+
+    pcap_close(pcap);
+}
+
 

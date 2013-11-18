@@ -69,13 +69,18 @@ typedef struct xcopy_clt_settings {
 #endif
     uint16_t      rand_port_shifted;   /* random port shifted */
     uint16_t      srv_port;            /* server listening port */
+
     char         *raw_rs_list;         /* raw real server list */
     real_ip_addr_t  real_servers;      /* the intercept servers running intercept */
     ip_port_pair_mappings_t transfer;  /* transfered online_ip online_port
                                            target_ip target_port */
-    int           multiplex_io;
-    int           sig;  
-    uint64_t      tries;  
+    int            multiplex_io;
+    int            sig;  
+    uint64_t       tries;  
+
+    uint64_t       mem_pool_size;  
+    uint64_t       mem_pool_index;  
+    unsigned char *mem_pool;  
 } xcopy_clt_settings;
 
 

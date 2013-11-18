@@ -53,6 +53,7 @@
 /* default mtu for output raw socket */
 #define DEFAULT_MTU   1500
 #define DEFAULT_MSS   1460
+#define MAX_FRAME_LENGTH 65550
 /* default listening port for intercept */
 #define SERVER_PORT   36524
 
