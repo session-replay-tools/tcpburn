@@ -69,6 +69,11 @@ gryphon_release_resources()
         free(clt_settings.transfer.mappings);
         clt_settings.transfer.mappings = NULL;
     }
+
+    if (clt_settings.mem_pool != NULL) {
+        free(clt_settings.mem_pool);
+        clt_settings.mem_pool = NULL;
+    }
 }
 
 void
