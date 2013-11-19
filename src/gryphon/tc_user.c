@@ -1128,9 +1128,9 @@ void
 release_user_resources()
 {
     int             i, rst_send_cnt = 0, valid_sess = 0;
-    frame_t        *fr, *next_fr;
+    frame_t        *fr;
     tc_user_t      *u;
-    p_session_entry e, next;
+    p_session_entry e;
 
     if (user_array) {
         for (i = 0; i < size_of_users; i++) {
@@ -1163,14 +1163,7 @@ release_user_resources()
                 if (e->data.has_req) {
                     valid_sess++;
                 }
-                while (fr) {
-                    next_fr = fr->next;
-                    free(fr);
-                    fr = next_fr;
-                }
-                next = e->next;
-                free(e);
-                e = next;
+                e = e->next;
             }
         }
 

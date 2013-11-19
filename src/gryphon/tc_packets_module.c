@@ -75,23 +75,26 @@ record_packet(uint64_t key, unsigned char *frame, int frame_len, uint32_t seq,
 
 
     if (entry == NULL) {
+        if (status != SYN_SENT) {
+            return;
+        }
 
-        fr = (frame_t *) calloc(1, sizeof(frame_t));
+        fr = (frame_t *) alloc_pool_mem(sizeof(frame_t));
         if (fr == NULL) {
             tc_log_info(LOG_WARN, 0, "calloc error for frame_t");
             return;
         }
         fr->frame_data = alloc_pool_mem(frame_len);
         if (fr->frame_data == NULL) {
+            tc_log_info(LOG_WARN, 0, "calloc error for frame data");
             return;
         }
         memcpy(fr->frame_data, frame, frame_len);
         fr->frame_len = frame_len;
 
         fr->seq = seq;
-        entry = (p_session_entry) calloc(1, sizeof(session_entry_t));
+        entry = (p_session_entry) alloc_pool_mem(sizeof(session_entry_t));
         if (entry == NULL) {
-            free(fr);
             tc_log_info(LOG_WARN, 0, "calloc error for session_entry_t");
             return;
         }
@@ -125,13 +128,15 @@ record_packet(uint64_t key, unsigned char *frame, int frame_len, uint32_t seq,
         }
 
         if (!session->end) {
-            fr = (frame_t *) calloc(1, sizeof(frame_t));
+        
+            fr = (frame_t *) alloc_pool_mem(sizeof(frame_t));
             if (fr == NULL) {
-                tc_log_info(LOG_WARN, 0, "calloc error for fr");
+                tc_log_info(LOG_WARN, 0, "calloc error for frame_t");
                 return;
             }
             fr->frame_data = alloc_pool_mem(frame_len);
             if (fr->frame_data == NULL) {
+                tc_log_info(LOG_WARN, 0, "calloc error for frame data");
                 return;
             }
             memcpy(fr->frame_data, frame, frame_len);
@@ -419,15 +424,19 @@ read_packets_from_pcap(char *pcap_file, char *filter)
 }
 
 void 
-calculate_pcap_content_for_pool(char *pcap_file, char *filter)
+calculate_mem_pool_size(char *pcap_file, char *filter)
 {
     int                 l2_len;
     char                ebuf[PCAP_ERRBUF_SIZE];
     bool                stop = false;
     pcap_t             *pcap;
+    uint16_t            size_ip, size_tcp;
     unsigned char      *pkt_data,*ip_data;
+    tc_ip_header_t     *ip_header;
+    tc_tcp_header_t    *tcp_header;
     struct bpf_program  fp;
     struct pcap_pkthdr  pkt_hdr;  
+
 
 
     if ((pcap = pcap_open_offline(pcap_file, ebuf)) == NULL) {
@@ -453,19 +462,36 @@ calculate_pcap_content_for_pool(char *pcap_file, char *filter)
         pkt_data = (u_char *) pcap_next(pcap, &pkt_hdr);
         if (pkt_data != NULL) {
 
-            if (pkt_hdr.caplen < pkt_hdr.len) {
-
-                tc_log_info(LOG_WARN, 0, "truncated packets,drop");
-            } else {
-
+            if (pkt_hdr.caplen >= pkt_hdr.len) {
                 ip_data = get_ip_data(pcap, pkt_data, pkt_hdr.len, &l2_len);
                 if (l2_len < ETHERNET_HDR_LEN) {
-                    tc_log_info(LOG_WARN, 0, "l2 len is %d", l2_len);
                     continue;
                 }
 
                 if (ip_data != NULL) {
-                    clt_settings.mem_pool_size += pkt_hdr.len;
+                    ip_header   = (tc_ip_header_t *) ip_data;
+                    if (ip_header->protocol != IPPROTO_TCP) {
+                        continue;
+                    }    
+                    size_ip = ip_header->ihl << 2;
+                    if (size_ip < 20) {
+                        continue;
+                    }
+                    tcp_header = (tc_tcp_header_t *) (ip_data + size_ip);
+                    size_tcp   = tcp_header->doff << 2;
+                    if (size_tcp < 20) {
+                        continue;
+                    }
+                    if (LOCAL != check_pack_src(&(clt_settings.transfer), 
+                                ip_header->daddr, tcp_header->dest, CHECK_DEST)) 
+                    {
+                        continue;
+                    }
+
+                    if (tcp_header->syn) {
+                        clt_settings.mem_pool_size += sizeof(session_entry_t);
+                    } 
+                    clt_settings.mem_pool_size += pkt_hdr.len + sizeof(frame_t);
                 }
             }
         } else {

@@ -175,11 +175,12 @@ gryphon_init(tc_event_loop_t *event_loop)
     }
 
     for (i = 0; i < clt_settings.num_pcap_files; i++) {
-        calculate_pcap_content_for_pool(clt_settings.pcap_files[i].file, 
+        calculate_mem_pool_size(clt_settings.pcap_files[i].file, 
                 clt_settings.filter);
     }
 
     tc_log_info(LOG_NOTICE, 0, "pool size:%llu", clt_settings.mem_pool_size);
+
     pool_size = clt_settings.mem_pool_size;
     if (clt_settings.mem_pool_size > 0) {
         clt_settings.mem_pool = (unsigned char *) calloc(pool_size, 
@@ -188,12 +189,13 @@ gryphon_init(tc_event_loop_t *event_loop)
             return TC_ERROR;
         }
     }
-    
 
     for (i = 0; i < clt_settings.num_pcap_files; i++) {
         read_packets_from_pcap(clt_settings.pcap_files[i].file, 
                 clt_settings.filter);
     }
+
+    tc_log_info(LOG_NOTICE, 0, "pool used:%llu", clt_settings.mem_pool_index);
 
     tc_event_timer_add(event_loop, 5000, tc_interval_dispose); 
 

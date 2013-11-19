@@ -54,24 +54,6 @@ check_pack_src(ip_port_pair_mappings_t *transfer, uint32_t ip,
     return ret;
 }
 
-unsigned char *
-cp_fr_ip_pack(tc_ip_header_t *ip_header)
-{
-    int            frame_len;
-    uint16_t       tot_len;
-    unsigned char *frame;
-    
-    tot_len   = ntohs(ip_header->tot_len);
-    frame_len = ETHERNET_HDR_LEN + tot_len;
-    frame     = (unsigned char *) malloc(frame_len);
-
-    if (frame != NULL) {    
-        memcpy(frame + ETHERNET_HDR_LEN, ip_header, tot_len);
-    }    
-
-    return frame;
-}
-
 inline bool
 tcp_seq_before(uint32_t seq1, uint32_t seq2)
 {

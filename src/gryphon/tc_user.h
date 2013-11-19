@@ -18,8 +18,8 @@ typedef struct session_data_s {
     frame_t *first_frame;
     frame_t *last_frame;
     uint32_t last_ack_seq;
-    uint16_t orig_src_port;
     uint32_t frames;
+    uint16_t orig_src_port;
     unsigned int end:1;
     unsigned int has_req:1;
     unsigned int status:16;
