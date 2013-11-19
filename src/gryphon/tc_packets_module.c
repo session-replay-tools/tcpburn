@@ -73,7 +73,10 @@ record_packet(uint64_t key, unsigned char *frame, int frame_len, uint32_t seq,
 
     entry = tc_retrieve_session(key);
 
-
+    if (status == SYN_SENT) {
+        tc_log_debug1(LOG_DEBUG, 0, "reuse port:%llu", ntohs(src_port));
+        entry = NULL;
+    }
     if (entry == NULL) {
         if (status != SYN_SENT) {
             return;
@@ -219,14 +222,12 @@ dispose_packet(unsigned char *frame, int frame_len, int ip_recv_len)
 #endif
     if (tcp_header->syn) {
         status = SYN_SENT;
-    } else if (tcp_header->fin) {
+    } else if (tcp_header->fin || tcp_header->rst) {
         status = CLIENT_FIN;
 #if (GRYPHON_COMET)
         saved = false;
 #endif
-    } else if (tcp_header->rst) {
-        status = CLIENT_FIN;
-    }
+    } 
     packets_considered_cnt++;
 
     key = tc_get_key(ip_header->saddr, tcp_header->source);

@@ -89,9 +89,6 @@ tc_add_session(p_session_entry entry)
     p_session_entry e = NULL, last = NULL;
 
     for(e = s_table->entries[index]; e != NULL; e = e->next) { 
-        if (e->key == entry->key) {   
-            return;
-        }   
         last = e;
     } 
 
@@ -176,15 +173,15 @@ tc_retrieve_session(uint64_t key)
 {
     uint32_t h = supplemental_hash((uint32_t) key);
     uint32_t index = table_index(h, s_table->size);
-    p_session_entry e = NULL;
+    p_session_entry e = NULL, last = NULL;
 
     for(e = s_table->entries[index]; e != NULL; e = e->next) { 
         if (e->key == key) {   
-            return e;
+            last = e;
         }   
     } 
 
-    return NULL;
+    return last;
 }
 
 static tc_user_t *
