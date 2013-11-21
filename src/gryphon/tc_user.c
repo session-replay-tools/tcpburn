@@ -99,8 +99,9 @@ tc_add_session(p_session_entry entry)
     }
 
     s_table->num_of_sessions++;
-    tc_log_info(LOG_NOTICE, 0, "index:%d,sessions in table:%d", 
+    tc_log_debug2(LOG_DEBUG, 0, "index:%d,sessions in table:%d",
             index, s_table->num_of_sessions);
+
 }
 
 static void
