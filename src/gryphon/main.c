@@ -79,6 +79,7 @@ usage(void)
            "               be set larger. The default value is 120 seconds\n");
     printf("-l <file>      save the log information in <file>\n"
            "-p <num>       set the target server listening port. The default value is 36524.\n");
+    printf("-e <num>       port seed\n");
     printf("-P <file>      save PID in <file>, only used with -d option\n");
     printf("-h             print this help and exit\n"
            "-v             version\n"
@@ -110,6 +111,7 @@ read_args(int argc, char **argv)
          "u:" 
          "C:" /* parallel connections between gryphon and intercept */
          "p:" /* target server port to listen on */
+         "e:" /* port seed */
          "M:" /* MTU sent to backend */
          "S:" /* mss value sent to backend */
          "t:" /* set the session timeout limit */
@@ -181,6 +183,9 @@ read_args(int argc, char **argv)
             case 'd':
                 clt_settings.do_daemonize = 1;
                 break;
+            case 'e':
+                clt_settings.port_seed = (unsigned int) atoi(optarg);
+                break;
             case 'p':
                 clt_settings.srv_port = atoi(optarg);
                 break;
@@ -214,6 +219,7 @@ read_args(int argc, char **argv)
                     case 'M':
                     case 'S':
                     case 't':
+                    case 'e':
                     case 'p':
                         fprintf(stderr, "gryphon: option -%c require a number\n",
                                 optopt);
@@ -682,6 +688,7 @@ settings_init()
     clt_settings.conn_init_sp_fact = DEFAULT_CONN_INIT_SP_FACT;
     clt_settings.mss = DEFAULT_MSS;
     clt_settings.srv_port = SERVER_PORT;
+    clt_settings.port_seed = 0;
     clt_settings.par_connections = 2;
     clt_settings.client_mode = 0;
     clt_settings.session_timeout = DEFAULT_SESSION_TIMEOUT;

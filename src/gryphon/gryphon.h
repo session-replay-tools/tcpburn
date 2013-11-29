@@ -74,6 +74,7 @@ typedef struct xcopy_clt_settings {
     real_ip_addr_t  real_servers;      /* the intercept servers running intercept */
     ip_port_pair_mappings_t transfer;  /* transfered online_ip online_port
                                            target_ip target_port */
+    unsigned int   port_seed;          /* port seed */
     int            multiplex_io;
     int            sig;  
     uint64_t       tries;  

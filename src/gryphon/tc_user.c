@@ -259,6 +259,21 @@ tc_retrieve_user(uint64_t key)
 
 }
 
+static uint16_t get_port(int default_port)
+{
+    int value;
+
+    if (clt_settings.port_seed) {
+        value = (int) ((rand_r(&clt_settings.port_seed) / (RAND_MAX + 1.0)) * 
+                VALID_PORTS_NUM);
+        value += FIRST_PORT;
+    } else {
+        value = default_port;
+    }
+
+    return htons((uint16_t) value);
+}
+
 bool 
 tc_build_users(int port_prioritized, int num_users, uint32_t *ips, int num_ip)
 {
@@ -318,9 +333,8 @@ tc_build_users(int port_prioritized, int num_users, uint32_t *ips, int num_ip)
     if (port_prioritized) {
         for ( i = 0; i < num_ip; i++) {
             ip = ips[i];
-
             for (j = FIRST_PORT; j <= LAST_PORT; j++) {
-                port = htons(j);
+                port = get_port(j);
                 key = tc_get_key(ip, port);
                 if (count >= size_of_users) {
                     break;
@@ -339,7 +353,7 @@ tc_build_users(int port_prioritized, int num_users, uint32_t *ips, int num_ip)
         }
     } else {
         for (j = FIRST_PORT; j <= LAST_PORT; j++) {
-            port = htons(j);
+            port = get_port(j);
             for ( i = 0; i < num_ip; i++) {
                 ip = ips[i];
 
