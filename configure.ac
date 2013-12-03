@@ -21,6 +21,9 @@ case "$host" in
 *) AC_MSG_ERROR([Linux only!]);;
 esac
 
+AC_CHECK_HEADERS([pcap.h], [], 
+                 [AC_MSG_ERROR([pcap.h not found.])], [])
+
 AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug],[compile gryphon with debug support(saved in a log file)]),,debug=no)
 if test "x$enable_debug" = "xyes";then
 	AC_DEFINE(GRYPHON_DEBUG, 1, [Define if --enable-debug])
@@ -44,8 +47,6 @@ fi
 AC_ARG_ENABLE(dlinject, AS_HELP_STRING([--enable-dlinject],[run gryphon at pcap sending mode]),,dlinject=no)
 if test "x$enable_dlinject" = "xyes";then
     AC_DEFINE(GRYPHON_PCAP_SEND, 1, [Define if --enable-dlinject])
-    AC_CHECK_HEADERS([pcap.h], [], 
-                     [AC_MSG_ERROR([pcap.h not found.])], [])
 fi
 
 
