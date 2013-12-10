@@ -365,8 +365,10 @@ read_packets_from_pcap(char *pcap_file, char *filter)
         if (pcap_setfilter(pcap, &fp) == -1) {
             fprintf(stderr, "Couldn't install filter %s: %s\n",
                     filter, pcap_geterr(pcap));
+            pcap_freecode(&fp);
             return;
         }
+        pcap_freecode(&fp);
     }
 
     while (!stop) {
@@ -454,8 +456,10 @@ calculate_mem_pool_size(char *pcap_file, char *filter)
         if (pcap_setfilter(pcap, &fp) == -1) {
             fprintf(stderr, "Couldn't install filter %s: %s\n",
                     filter, pcap_geterr(pcap));
+            pcap_freecode(&fp);
             return;
         }
+        pcap_freecode(&fp);
     }
 
     while (!stop) {
