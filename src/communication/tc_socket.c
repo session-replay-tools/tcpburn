@@ -256,7 +256,7 @@ tc_socket_listen(int fd, const char *bind_ip, uint16_t port)
 int
 tc_socket_cmb_recv(int fd, int *num, char *buffer)
 {
-    int     read_num = 0;
+    int     read_num = 0, cnt = 0;
     size_t  last;
     ssize_t n, len;
 
@@ -268,6 +268,11 @@ tc_socket_cmb_recv(int fd, int *num, char *buffer)
 
         if (n == -1) {
             if (errno == EAGAIN || errno == EINTR) {
+                if (cnt > MAX_RW_TRIES) {
+                    tc_log_info(LOG_ERR, 0, "recv timeout,fd:%d", fd);
+                    return TC_ERROR;
+                }
+                cnt++;
                 continue;
             } else {
                 tc_log_info(LOG_NOTICE, errno, "return -1,fd:%d", fd);
@@ -315,6 +320,7 @@ tc_socket_cmb_recv(int fd, int *num, char *buffer)
 int
 tc_socket_send(int fd, char *buffer, int len)
 {
+    int         cnt = 0;
     ssize_t     send_len, offset = 0, num_bytes;
     const char *ptr;
 
@@ -331,10 +337,16 @@ tc_socket_send(int fd, char *buffer, int len)
 
         if (send_len == -1) {
 
+            if (cnt > MAX_RW_TRIES) {
+                tc_log_info(LOG_ERR, 0, "send timeout,fd:%d", fd);
+                return TC_ERROR;
+            }
             if (errno == EINTR) {
                 tc_log_info(LOG_NOTICE, errno, "fd:%d EINTR", fd);
+                cnt++;
             } else if (errno == EAGAIN) {
                 tc_log_debug1(LOG_NOTICE, errno, "fd:%d EAGAIN", fd);
+                cnt++;
             } else {
                 tc_log_info(LOG_ERR, errno, "fd:%d", fd);
                 return TC_ERROR;

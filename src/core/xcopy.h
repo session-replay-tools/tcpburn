@@ -71,6 +71,8 @@
 #define OUTPUT_INTERVAL  5000
 #define DEFAULT_SESSION_TIMEOUT 120
 
+#define MAX_RW_TRIES 1024
+
 #define SLOT_MAX 256
 #define SLOT_AVG 32 
 

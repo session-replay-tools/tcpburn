@@ -101,10 +101,10 @@ static bool send_version(int fd) {
 static int
 connect_to_server(tc_event_loop_t *event_loop)
 {
-    int                      i, j, fd;
-    uint32_t                 target_ip;
-    uint16_t                 target_port;
-
+    int                    i, j, fd;
+    uint32_t               target_ip;
+    uint16_t               target_port;
+    connections_t         *connections;
 
     /* 
      * add connections to the real servers for sending router info 
@@ -120,6 +120,19 @@ connect_to_server(tc_event_loop_t *event_loop)
 
         if (clt_settings.real_servers.active[i] != 0) {
             continue;
+        }
+
+        connections = &(clt_settings.real_servers.connections[i]);
+        for (j = 0; j < connections->num; j++) {
+            fd = connections->fds[j];
+            if (fd > 0) {
+                tc_log_info(LOG_NOTICE, 0, "it close socket:%d", fd);
+                tc_socket_close(fd);
+                tc_event_del(clt_settings.ev[fd]->loop, 
+                        clt_settings.ev[fd], TC_EVENT_READ);
+                tc_event_destroy(clt_settings.ev[fd], 0);
+                connections->fds[j] = -1;
+            }
         }
 
         clt_settings.real_servers.connections[i].num = 0;
