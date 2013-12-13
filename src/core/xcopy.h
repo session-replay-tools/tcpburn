@@ -10,16 +10,6 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <linux/if_ether.h>
-#if (!INTERCEPT_ADVANCED)
-#if (!INTERCEPT_NFQUEUE)
-#include <linux/netlink.h>
-#include <linux/netfilter_ipv4.h>
-#include <linux/netfilter_ipv4/ip_queue.h>
-#else
-#include <linux/netfilter.h> 
-#include <libnetfilter_queue/libnetfilter_queue.h>
-#endif
-#endif
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <sys/syscall.h>

@@ -78,6 +78,7 @@ typedef struct xcopy_clt_settings {
     int            multiplex_io;
     int            sig;  
     uint64_t       tries;  
+    tc_event_t    *ev[MAX_FD_NUM];
 
     uint64_t       mem_pool_size;  
     uint64_t       mem_pool_index;  

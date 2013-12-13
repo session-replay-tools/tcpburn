@@ -130,7 +130,7 @@ connect_to_server(tc_event_loop_t *event_loop)
                 tc_socket_close(fd);
                 tc_event_del(clt_settings.ev[fd]->loop, 
                         clt_settings.ev[fd], TC_EVENT_READ);
-                tc_event_destroy(clt_settings.ev[fd], 0);
+                tc_event_destroy(clt_settings.ev[fd]);
                 connections->fds[j] = -1;
             }
         }

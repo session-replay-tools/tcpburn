@@ -36,6 +36,8 @@ tc_message_init(tc_event_loop_t *event_loop, uint32_t ip, uint16_t port)
         return TC_INVALID_SOCKET;
     }
 
+    clt_settings.ev[fd] = ev; 
+
     if (tc_event_add(event_loop, ev, TC_EVENT_READ) == TC_EVENT_ERROR) {
         return TC_INVALID_SOCKET;
     }
