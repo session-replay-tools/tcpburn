@@ -1073,7 +1073,9 @@ void process_outgress(unsigned char *packet)
             send_faked_rst(u);
             if (!u->state.over) {
                 fin_recv_cnt++;
-                active_conn_cnt--;
+                if (u->state.resp_syn_received) {
+                    active_conn_cnt--;
+                }
             }
             u->state.over = 1;
         } else if (tcp_header->rst) {
@@ -1086,7 +1088,9 @@ void process_outgress(unsigned char *packet)
                 }
             }
             if (!u->state.over) {
-                active_conn_cnt--;
+                if (u->state.resp_syn_received) {
+                    active_conn_cnt--;
+                }
             }
             u->state.over = 1;
             u->state.status  |= SERVER_RST;
