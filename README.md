@@ -1,4 +1,4 @@
-#[Gryphon](https://github.com/wangbin579/gryphon) - Simulating millions of concurrent users
+#Gryphon - Simulating millions of concurrent users
 
 #简单说明
 Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个软件，目的是能够用较少的资源来模拟出大量并发用户，并且能够更加真实地进行压力测试， 以解决网络消息推送服务方面的压力测试的问题和传统压力测试的问题。Gryphon分为两个程序，一个运行gryphon，用来模拟用户，一个是 intercept，用来截获响应包信息给gryphon。Gryphon模拟用户的本质是用一个连接来模拟一个用户，所以有多少个连接，就有多少个用户，而用户的素材则取自于pcap抓包文件。
@@ -39,7 +39,8 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	git clone git://github.com/wangbin579/tcpcopy.git
 	cd tcpcopy
 	sh autogen.sh
-	./configure --enable-single   #由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，这时候gryphon采用"--enable-single"模式最佳
+    #由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，这时候gryphon采用"--enable-single"模式最佳
+	./configure --enable-single   
 	make
 	make install
 	具体执行如下：
@@ -55,7 +56,8 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
         iptables -I OUTPUT -p tcp --sport port -j NFQUEUE # if not set
         ./intercept
 
-	如果是comet应用，那么应该在intercept设置-x参数，设置可以访问测试服务器的ip地址，以便让这个ip地址来publish主题
+	如果是comet应用，那么应该在intercept设置-x参数，设置可以访问测试服务器的ip地址，
+    以便让这个ip地址来publish主题
 
 ###2）下载编译运行gryphon：
 
@@ -64,27 +66,32 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	sh autogen.sh
 	
 	如果是非comet应用：
-	./configure --enable-single
+	   ./configure --enable-single
 	如果是comet类似的消息推送应用
-	./configure --enable-single --enable-comet  #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
+       #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
+	   ./configure --enable-single --enable-comet  
 	
 	make
 	make install
 	
-	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> -s <intercept address> -u <user num> -c <ip range,>
+	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> 
+    -s <intercept address> -u <user num> -c <ip range,>
 	
 	比如：
 	
-	./gryphon -x 80-61.xxx.xxx.217:80 -f /home/wangbin/work/github/80.pcap -s 10.yyy.yyy.217 -u 10000 -c 62.135.200.*
+	./gryphon -x 80-61.xxx.xxx.217:80 -f /home/wangbin/work/github/80.pcap -s 10.yyy.yyy.217 
+    -u 10000 -c 62.135.200.*
 	
-	从/home/wangbin/80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，其中模拟的用户数量为10000个用户，ip地址范围为62.135.200.*系列,intercept所在的机器ip地址为10.yyy.yyy.217
+	从/home/wangbin/80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，
+    其中模拟的用户数量为10000个用户，ip地址范围为62.135.200.*系列,intercept所在的机器ip地址为10.yyy.yyy.217
 
 ###传统使用方式注意事项：
 
 	1）-c参数指定的ip地址范围，目前只能是最后一个为‘*'，如果需要多个网段的ip地址，则采用‘,’隔开
 	2）-s参数指定intercept所在机器的地址，一般只需指定ip地址即可
 	3）-f文件，用来指定需要回放的pcap文件，要确保此文件尽可能完整，而且不丢包
-	4）对于消息推送服务，需要用不同于targetServerIP的方式来访问（比如内网ip地址来publish主题，外网ip地址来供模拟客户端用户来访问），并设置intercept的-x参数
+	4）对于消息推送服务，需要用不同于targetServerIP的方式来访问（比如内网ip地址来publish主题，
+       外网ip地址来供模拟客户端用户来访问），并设置intercept的-x参数
 	5) gryphon定义的一个用户，就是一个连接的会话，从pcap文件中提取，所以用户构造会话过程，要注意连接的特性。
 	6）采用传统方式，一定要确保ip queue或者nfqueue不丢包
 	7）对于pcap文件，还可以采用-F参数来过滤。
@@ -101,7 +108,8 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	git clone git://github.com/wangbin579/tcpcopy.git
 	cd tcpcopy
 	sh autogen.sh
-	./configure --enable-single  --enable-pcap --enable-advanced  #由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，采用"--enable-single"模式效果最佳
+    #由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，采用"--enable-single"模式效果最佳
+	./configure --enable-single  --enable-pcap --enable-advanced  
 	make
 	make install
 	
@@ -138,27 +146,33 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	sh autogen.sh
 	
 	如果是非comet应用：
-	./configure --enable-single --enable-advanced
+	  ./configure --enable-single --enable-advanced
 	如果是comet类似的消息推送应用
-	./configure --enable-single --enable-advanced --enable-comet  #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
+      #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
+	  ./configure --enable-single --enable-advanced --enable-comet  
 	
 	make
 	make install
 	
-	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> -s <intercept address> -u <user num> -c <ip range,>
+	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> 
+    -s <intercept address> -u <user num> -c <ip range,>
 	
 	比如：
 	
-	./gryphon -x 80-61.xxx.xxx.217:80 -f /home/wangbin/work/github/80.pcap -s 10.yyy.yyy.161 -u 10000 -c 62.135.200.*
+	./gryphon -x 80-61.xxx.xxx.217:80 -f /home/wangbin/work/github/80.pcap -s 10.yyy.yyy.161 
+    -u 10000 -c 62.135.200.*
 	
-	从/home/wangbin/80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，其中模拟的用户数量为10000个用户，客户端ip地址范围为62.135.200.*系列,intercept所在的机器内网ip地址为10.yyy.yyy.161（外网ip地址为61.135.233.161)
+	从/home/wangbin/80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，
+    其中模拟的用户数量为10000个用户，客户端ip地址范围为62.135.200.*系列,intercept所在的机器内网ip地址为
+    10.yyy.yyy.161（外网ip地址为61.135.233.161)
 
 ###高级使用方式注意事项：
 	
 	1）-c参数指定的ip地址范围，目前只能是最后一个为‘*'，如果需要多个网段的ip地址，则采用‘,’隔开
 	2）-s参数指定intercept所在机器的地址，一般只需指定ip地址即可
 	3）-f文件，用来指定需要回放的pcap文件，要确保此文件尽可能完整，而且不丢包
-	4）对于消息推送服务，需要确保有ip地址能够publish主题（比如内网ip地址来publish主题，外网ip地址来供模拟客户端用户来访问，外网的访问，其响应走辅助服务器）
+	4）对于消息推送服务，需要确保有ip地址能够publish主题（比如内网ip地址来publish主题，
+       外网ip地址来供模拟客户端用户来访问，外网的访问，其响应走辅助服务器）
 	5）gryphon定义的一个用户，就是一个连接的会话，从pcap文件中提取，所以用户构造会话过程，要注意连接的特性。
 	6）对于pcap文件，还可以采用-F参数来过滤。
 	7）对于comet应用，pcap文件最好不要包含publish的请求
