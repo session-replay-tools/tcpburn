@@ -1,4 +1,4 @@
-#Gryphon - Simulating millions of concurrent users
+# A tool to simulate millions of concurrent users
 
 #简单说明
 Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个软件，目的是能够用较少的资源来模拟出大量并发用户，并且能够更加真实地进行压力测试， 以解决网络消息推送服务方面的压力测试的问题和传统压力测试的问题。Gryphon分为两个程序，一个运行gryphon，用来模拟用户，一个是 intercept，用来截获响应包信息给gryphon。Gryphon模拟用户的本质是用一个连接来模拟一个用户，所以有多少个连接，就有多少个用户，而用户的素材则取自于pcap抓包文件。
@@ -82,7 +82,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	./gryphon -x 80-61.xxx.xxx.217:80 -f /home/wangbin/work/github/80.pcap -s 10.yyy.yyy.217 
     -u 10000 -c 62.135.200.*
 	
-	从/home/wangbin/80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，
+	从80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，
     其中模拟的用户数量为10000个用户，ip地址范围为62.135.200.*系列,intercept所在的机器ip地址为10.yyy.yyy.217
 
 ###传统使用方式注意事项：
@@ -162,7 +162,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	./gryphon -x 80-61.xxx.xxx.217:80 -f /home/wangbin/work/github/80.pcap -s 10.yyy.yyy.161 
     -u 10000 -c 62.135.200.*
 	
-	从/home/wangbin/80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，
+	从80.pcap抓包文件中提取出访问80端口的用户会话过程，复制到61.xxx.xxx.217服务器的80端口中去，
     其中模拟的用户数量为10000个用户，客户端ip地址范围为62.135.200.*系列,intercept所在的机器内网ip地址为
     10.yyy.yyy.161（外网ip地址为61.135.233.161)
 
