@@ -85,6 +85,7 @@ typedef struct tc_user_s {
     frame_t        *orig_unack_frame;
 
     time_t   last_sent_time;
+    long     last_recv_resp_cont_time;
 
 }tc_user_t;
 

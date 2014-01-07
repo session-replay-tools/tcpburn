@@ -27,6 +27,9 @@ static unsigned char *alloc_pool_mem(int length)
         tc_log_info(LOG_ERR, 0, "pool full, calloc error for frame data");
         return NULL;
     }
+
+    memset(p, 0, length);
+
     return p;
 }
 

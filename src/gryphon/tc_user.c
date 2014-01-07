@@ -424,7 +424,8 @@ tc_build_users(int port_prioritized, int num_users, uint32_t *ips, int num_ip)
 
 static bool send_stop(tc_user_t *u) 
 {
-    int       time_diff;
+    int       send_diff;
+    long      app_resp_diff;
     uint32_t  srv_sk_buf_s;
 
     if (u->orig_frame == NULL) {
@@ -449,8 +450,10 @@ static bool send_stop(tc_user_t *u)
         }
     }
 
-    time_diff = tc_time() - u->last_sent_time;
-    if (time_diff >= 3) {
+    send_diff = tc_time() - u->last_sent_time;
+    if (send_diff >= 3) {
+        tc_log_debug1(LOG_DEBUG, 0, "timeout, need to send more packet:%d", 
+                ntohs(u->src_port));
         u->state.resp_waiting = 0; 
         return false;
     }
@@ -473,6 +476,15 @@ static bool send_stop(tc_user_t *u)
         }
 
     }
+
+    app_resp_diff = tc_milliscond_time() - u->last_recv_resp_cont_time;
+    if (app_resp_diff <= 10) {
+        tc_log_debug1(LOG_DEBUG, 0, "need to wait resp complete:%d", 
+                ntohs(u->src_port));
+        return true;
+    }
+    tc_log_debug1(LOG_DEBUG, 0, "last resort, set stop false:%d", 
+                ntohs(u->src_port));
 
     return false;
 }
@@ -744,13 +756,20 @@ void process_user_packet(tc_user_t *u)
         if (send_stop(u)) {
             break;
         }
+        tc_log_debug1(LOG_DEBUG, 0, "check resp waiting:%u",
+                ntohs(u->src_port));
         if (!u->orig_frame->belong_to_the_same_req) {
-            if (u->state.status & SYN_ACK) {
+            tc_log_debug2(LOG_DEBUG, 0, "user state:%d,port:%u",
+                u->state.status, ntohs(u->src_port));
+            if (u->state.status & SYN_CONFIRM) {
                 tc_log_debug1(LOG_DEBUG, 0, "set resp waiting:%u",
                         ntohs(u->src_port));
                 u->state.resp_waiting = 1;
             }
             break;
+        } else {
+            tc_log_debug1(LOG_DEBUG, 0, "the same req:%u",
+                ntohs(u->src_port));
         }
     }
 }
@@ -1034,6 +1053,7 @@ void process_outgress(unsigned char *packet)
 
 
         if (cont_len > 0) {
+            u->last_recv_resp_cont_time = tc_milliscond_time();
             resp_cont_cnt++;
             u->state.resp_waiting = 0;   
             u->exp_ack_seq = htonl(seq + cont_len);
@@ -1061,7 +1081,6 @@ void process_outgress(unsigned char *packet)
                     }
                 }
                 process_user_packet(u);
-                u->state.status |= SYN_ACK;
 
             } else {
                 tc_log_debug1(LOG_DEBUG, 0, "syn, but already syn received:%u",
