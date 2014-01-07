@@ -173,7 +173,7 @@ connect_to_server(tc_event_loop_t *event_loop)
 int
 gryphon_init(tc_event_loop_t *event_loop)
 {
-    int      i;
+    int      i, result;
     uint64_t pool_size;
 
     /* register some timer */
@@ -188,8 +188,11 @@ gryphon_init(tc_event_loop_t *event_loop)
     }
 
     for (i = 0; i < clt_settings.num_pcap_files; i++) {
-        calculate_mem_pool_size(clt_settings.pcap_files[i].file, 
+        result = calculate_mem_pool_size(clt_settings.pcap_files[i].file, 
                 clt_settings.filter);
+        if (result == TC_ERROR) {
+            return TC_ERROR;
+        }
     }
 
     tc_log_info(LOG_NOTICE, 0, "pool size:%llu", clt_settings.mem_pool_size);

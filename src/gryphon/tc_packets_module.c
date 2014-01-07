@@ -427,7 +427,7 @@ read_packets_from_pcap(char *pcap_file, char *filter)
     
 }
 
-void 
+int
 calculate_mem_pool_size(char *pcap_file, char *filter)
 {
     int                 l2_len;
@@ -441,24 +441,22 @@ calculate_mem_pool_size(char *pcap_file, char *filter)
     struct bpf_program  fp;
     struct pcap_pkthdr  pkt_hdr;  
 
-
-
     if ((pcap = pcap_open_offline(pcap_file, ebuf)) == NULL) {
         tc_log_info(LOG_ERR, 0, "open %s" , ebuf);
-        return;
+        return TC_ERROR;
     }
 
     if (filter != NULL) {
         if (pcap_compile(pcap, &fp, filter, 0, 0) == -1) {
             tc_log_info(LOG_ERR, 0, "couldn't parse filter %s: %s", 
                     filter, pcap_geterr(pcap));
-            return;
+            return TC_ERROR;
         }   
         if (pcap_setfilter(pcap, &fp) == -1) {
             fprintf(stderr, "Couldn't install filter %s: %s\n",
                     filter, pcap_geterr(pcap));
             pcap_freecode(&fp);
-            return;
+            return TC_ERROR;
         }
         pcap_freecode(&fp);
     }
@@ -509,6 +507,8 @@ calculate_mem_pool_size(char *pcap_file, char *filter)
     }
 
     pcap_close(pcap);
+
+    return TC_OK;
 }
 
 
