@@ -204,7 +204,7 @@ tc_retrieve_active_user()
            tc_log_info(LOG_NOTICE, 0, "total is larger than size of users");
            init_phase = false;
            u = user_array + 0;
-           base_user_seq = 1;
+           base_user_seq = 1 % size_of_users;
         } else {
             u = user_array + total;
             speed = clt_settings.conn_init_sp_fact;
@@ -483,6 +483,7 @@ static bool send_stop(tc_user_t *u)
                 ntohs(u->src_port));
         return true;
     }
+
     tc_log_debug1(LOG_DEBUG, 0, "last resort, set stop false:%d", 
                 ntohs(u->src_port));
 
@@ -747,6 +748,10 @@ void process_user_packet(tc_user_t *u)
     }
 
     while (true) {
+        if (u->orig_frame->frame_len > MAX_FRAME_LENGTH) {
+            tc_log_info(LOG_NOTICE, 0, " frame length may be damaged");
+        }
+
         memcpy(frame, u->orig_frame->frame_data, u->orig_frame->frame_len);
         process_packet(u, frame);
         u->total_packets_sent++;

@@ -28,8 +28,6 @@ static unsigned char *alloc_pool_mem(int length)
         return NULL;
     }
 
-    memset(p, 0, length);
-
     return p;
 }
 
