@@ -682,6 +682,8 @@ static bool process_packet(tc_user_t *u, unsigned char *frame)
     } else if (tcp_header->rst) {
         rst_sent_cnt++;
         u->state.status  |= CLIENT_FIN;
+        tc_log_debug1(LOG_DEBUG, 0, "a reset packet to back:%u",
+                ntohs(u->src_port));
     }
 
     if (cont_len > 0) {
