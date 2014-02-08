@@ -54,7 +54,7 @@ check_pack_src(ip_port_pair_mappings_t *transfer, uint32_t ip,
     return ret;
 }
 
-inline bool
+bool
 tcp_seq_before(uint32_t seq1, uint32_t seq2)
 {
     return (int32_t)(seq1-seq2) < 0;

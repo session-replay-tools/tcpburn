@@ -16,7 +16,7 @@ ip_port_pair_mapping_t *get_test_pair(ip_port_pair_mappings_t *target,
         uint32_t ip, uint16_t port);
 int check_pack_src(ip_port_pair_mappings_t *target, uint32_t ip, 
         uint16_t port, int src_flag);
-inline bool tcp_seq_before(uint32_t seq1, uint32_t seq2);
+bool tcp_seq_before(uint32_t seq1, uint32_t seq2);
 unsigned short csum (unsigned short *packet, int pack_len);
 unsigned short tcpcsum(unsigned char *iphdr, unsigned short *packet,
         int pack_len);
