@@ -158,8 +158,8 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	
 	./gryphon -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> 
     -s <intercept address> -u <user num> -c <ip range,>
-    
-    	注:上述historyServerPort是录制的pcap文件中的server端口
+	
+	注:上述historyServerPort是录制的pcap文件中的server端口
 	
 	比如：
 	
