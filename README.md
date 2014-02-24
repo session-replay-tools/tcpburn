@@ -39,7 +39,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	git clone git://github.com/wangbin579/tcpcopy.git
 	cd tcpcopy
 	sh autogen.sh
-    #由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，这时候gryphon采用"--enable-single"模式最佳
+	#由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，这时候gryphon采用"--enable-single"模式最佳
 	./configure --enable-single   
 	make
 	make install
@@ -68,7 +68,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	如果是非comet应用：
 	   ./configure --enable-single
 	如果是comet类似的消息推送应用
-       #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
+	   #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
 	   ./configure --enable-single --enable-comet  
 	
 	make
@@ -99,7 +99,8 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	7）对于pcap文件，还可以采用-F参数来过滤。
 	8）对于comet应用，pcap文件最好不要包含publish的请求
 	9）默认采用raw socket发包，这时候需要关闭ip_conntrack模块或者采用pcap发包（"--enable-dlinject"）
-	10）更多信息还可以见-h命令
+	10）intercept要运行在测试服务器上面
+	11）更多信息还可以见-h命令
 
 #高级架构
 
@@ -110,7 +111,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	git clone git://github.com/wangbin579/tcpcopy.git
 	cd tcpcopy
 	sh autogen.sh
-    #由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，采用"--enable-single"模式效果最佳
+	#由于gryphon可以模拟大量用户，一般只需要运行一个gryphon实例即可，采用"--enable-single"模式效果最佳
 	./configure --enable-single  --enable-pcap --enable-advanced  
 	make
 	make install
@@ -150,7 +151,7 @@ Gryphon是由网易自主研发的能够模拟千万级别并发用户的一个�
 	如果是非comet应用：
 	  ./configure --enable-single --enable-advanced
 	如果是comet类似的消息推送应用
-      #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
+	  #会过滤掉pcap文件中的连接关闭命令，由服务器来主动关闭连接
 	  ./configure --enable-single --enable-advanced --enable-comet  
 	
 	make
