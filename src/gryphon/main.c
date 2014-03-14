@@ -787,12 +787,6 @@ main(int argc, char **argv)
     }
 
     if (is_continue) {
-        if (set_timer() == -1) {
-            is_continue = 0;
-        }   
-    }
-
-    if (is_continue) {
         /* run now */
         tc_event_process_cycle(&event_loop);
     }
