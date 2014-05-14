@@ -65,6 +65,7 @@ usage(void)
     printf("-M <num>       MTU value sent to backend (default 1500)\n");
     printf("-u <num>       concurrent users\n");
     printf("-c <ip,>       client ips\n");
+    printf("-a <num>       throughput factor(default 1)\n");
     printf("-i <num>       connection init speed fact(default 1024 connectins per second)\n");
     printf("-S <num>       MSS value sent back(default 1460)\n");
     printf("-C <num>       parallel connections between gryphon and intercept.\n"
@@ -101,7 +102,7 @@ read_args(int argc, char **argv)
          "f:" /* input pcap file list */
          "F:" 
          "c:" /* client ip list */
-         "a:" /* accelerated times */
+         "a:" /* throughput factor */
          "I:" /* threshold interval time for acceleratation */
          "i:" 
 #if (GRYPHON_PCAP_SEND)
