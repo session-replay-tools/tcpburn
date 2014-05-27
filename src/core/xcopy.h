@@ -136,8 +136,7 @@ enum session_status{
     SEND_REQ          = 8,
     RECV_RESP         = 16,
     SERVER_FIN        = 32,
-    CLIENT_FIN        = 64,
-    SERVER_RST        = 128
+    CLIENT_FIN        = 64
 };
 
 enum packet_classification{

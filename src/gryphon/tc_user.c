@@ -4,6 +4,7 @@
 
 static bool    init_phase       = true;
 static time_t  record_time      = 0;
+static time_t  last_resp_time   = 0;
 
 static int size_of_user_index   = 0;
 static int size_of_users        = 0;
@@ -27,6 +28,8 @@ static uint64_t orig_clt_packs_cnt = 0;
 static tc_user_index_t  *user_index_array = NULL;
 static tc_user_t        *user_array       = NULL;
 static session_table_t  *s_table          = NULL;
+
+static void send_faked_rst(tc_user_t *u);
 
 static uint32_t 
 supplemental_hash(uint32_t value)                                                                 
@@ -114,7 +117,8 @@ tc_init_session_for_users()
     session_data_t *sess;
 
     if (s_table->num_of_sessions == 0) {
-        tc_log_info(LOG_WARN, 0, "no sessions for replay");
+        tc_log_info(LOG_ERR, 0, "no sessions for replay");
+        tc_over = 1;
         return;
     }
 
@@ -773,8 +777,7 @@ void process_user_packet(tc_user_t *u)
             }
             break;
         } else {
-            tc_log_debug1(LOG_DEBUG, 0, "the same req:%u",
-                ntohs(u->src_port));
+            tc_log_debug1(LOG_DEBUG, 0, "the same req:%u",  ntohs(u->src_port));
         }
     }
 }
@@ -1010,6 +1013,7 @@ void process_outgress(unsigned char *packet)
     tc_ip_header_t    *ip_header;
     tc_tcp_header_t   *tcp_header;
 
+    last_resp_time = tc_time();
     resp_cnt++;
     ip_header  = (tc_ip_header_t *) packet;
     size_ip    = ip_header->ihl << 2;
@@ -1096,14 +1100,10 @@ void process_outgress(unsigned char *packet)
                     ntohs(u->src_port));
             u->exp_ack_seq = htonl(ntohl(u->exp_ack_seq) + 1);
             u->state.status  |= SERVER_FIN;
-            send_faked_rst(u);
-            if (!u->state.over) {
-                fin_recv_cnt++;
-                if (u->state.resp_syn_received) {
-                    active_conn_cnt--;
-                }
-            }
-            u->state.over = 1;
+            send_faked_ack(u);
+            process_user_packet(u);
+            fin_recv_cnt++;
+
         } else if (tcp_header->rst) {
             tc_log_info(LOG_NOTICE, 0, "recv rst from back:%u", 
                     ntohs(u->src_port));
@@ -1113,15 +1113,10 @@ void process_outgress(unsigned char *packet)
                     conn_reject_cnt++;
                 }
             }
-            if (!u->state.over) {
-                if (u->state.resp_syn_received) {
-                    active_conn_cnt--;
-                }
-            }
-            u->state.over = 1;
-            u->state.status  |= SERVER_RST;
-        }
 
+            u->state.over = 1;
+            u->state.status  |= SERVER_FIN;
+        }
 
     } else {
         tc_log_debug_trace(LOG_DEBUG, 0, BACKEND_FLAG, ip_header,
@@ -1132,16 +1127,44 @@ void process_outgress(unsigned char *packet)
 }
 
 
+static void 
+check_replay_complete()
+{
+#if (!GRYPHON_COMET)
+    int  diff;
+
+    if (last_resp_time) {
+        diff = tc_time() - last_resp_time;
+        if (diff > DEFAULT_TIMEOUT) {
+            tc_over = 1;
+        }
+    }
+#endif
+}
+
 
 void process_ingress()
 {
-    tc_user_t      *u = NULL;
+    tc_user_t  *u = NULL;
 
     u = tc_retrieve_active_user();
 
     if (!u->state.over) {
         process_user_packet(u);
+        if ((u->state.status & CLIENT_FIN) && (u->state.status & SERVER_FIN)) {
+            u->state.over = 1;
+        }
+    } else {
+        if (!u->state.over_recorded) {
+            u->state.over_recorded = 1;
+            active_conn_cnt--;
+            if (active_conn_cnt == 0) {
+                tc_over = 1;
+            }
+        }
     }
+    
+    check_replay_complete();
 }
 
 void
@@ -1174,28 +1197,30 @@ release_user_resources()
     tc_user_t      *u;
     p_session_entry e;
 
-    if (user_array) {
-        for (i = 0; i < size_of_users; i++) {
-            u = user_array + i;
-            if (!(u->state.status & SYN_CONFIRM)) {
-                tc_log_info(LOG_NOTICE, 0, "connection fails:%u", 
-                        ntohs(u->src_port));
-            }
-            if (u->total_packets_sent < u->orig_session->frames) {
-                tc_log_debug3(LOG_DEBUG, 0, 
-                        "total sent frames:%u, total:%u, p:%u", 
-                        u->total_packets_sent, u->orig_session->frames, 
-                        ntohs(u->src_port));
-            }
-            if (u->state.status && !u->state.over) {
-                send_faked_rst(u);
-                rst_send_cnt++;
+    if (s_table && s_table->num_of_sessions > 0) {
+        if (user_array) {
+            for (i = 0; i < size_of_users; i++) {
+                u = user_array + i;
+                if (!(u->state.status & SYN_CONFIRM)) {
+                    tc_log_info(LOG_NOTICE, 0, "connection fails:%u", 
+                            ntohs(u->src_port));
+                }
+                if (u->total_packets_sent < u->orig_session->frames) {
+                    tc_log_debug3(LOG_DEBUG, 0, 
+                            "total sent frames:%u, total:%u, p:%u", 
+                            u->total_packets_sent, u->orig_session->frames, 
+                            ntohs(u->src_port));
+                }
+                if (u->state.status && !u->state.over) {
+                    send_faked_rst(u);
+                    rst_send_cnt++;
+                }
             }
         }
-    }
 
-    tc_log_info(LOG_NOTICE, 0, "send %d reset packs to release tcp resources", 
-            rst_send_cnt);
+        tc_log_info(LOG_NOTICE, 0, "send %d resets to release tcp resources", 
+                rst_send_cnt);
+    }
 
     if (s_table) {
         for (i = 0; i < s_table->size; i++) {

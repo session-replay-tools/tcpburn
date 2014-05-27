@@ -41,6 +41,7 @@ typedef struct tc_user_state_s{
     uint32_t status:16;
     uint32_t closed_pattern:8;
     uint32_t over:1;
+    uint32_t over_recorded:1;
     uint32_t timestamped:1;
     uint32_t resp_syn_received:1;
     uint32_t resp_waiting:1;
