@@ -158,9 +158,6 @@ connect_to_server(tc_event_loop_t *event_loop)
             clt_settings.real_servers.connections[i].remained_num++;
 
         }
-
-        tc_log_info(LOG_NOTICE, 0, "add dr tunnels for exchanging info:%u:%u",
-                target_ip, target_port);
     }
 
     return TC_OK;

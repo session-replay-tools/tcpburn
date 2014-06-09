@@ -806,7 +806,7 @@ send_faked_rst(tc_user_t *u)
     tcp_header->dest    = u->dst_port;
     tcp_header->seq     = u->exp_seq;
     tcp_header->ack_seq = u->exp_ack_seq;
-    tcp_header->window  = htons(65535); 
+    tcp_header->window  = 65535; 
     tcp_header->ack     = 1;
     tcp_header->rst     = 1;
     tcp_header->doff    = TCP_HEADER_DOFF_MIN_VALUE;
@@ -838,7 +838,7 @@ send_faked_ack(tc_user_t *u)
     tcp_header->dest    = u->dst_port;
     tcp_header->seq     = u->exp_seq;
     tcp_header->ack_seq = u->exp_ack_seq;
-    tcp_header->window  = htons(65535); 
+    tcp_header->window  = 65535; 
     tcp_header->ack     = 1;
     if (u->state.timestamped) {
         ip_header->tot_len  = htons(FAKE_IP_TS_DATAGRAM_LEN);
@@ -1092,6 +1092,7 @@ void process_outgress(unsigned char *packet)
                 process_user_packet(u);
 
             } else {
+                send_faked_ack(u);
                 tc_log_debug1(LOG_DEBUG, 0, "syn, but already syn received:%u",
                     ntohs(u->src_port));
             }
@@ -1192,18 +1193,23 @@ tc_interval_dispose(tc_event_timer_t *evt)
 void 
 release_user_resources()
 {
-    int             i, rst_send_cnt = 0, valid_sess = 0;
-    frame_t        *fr;
-    tc_user_t      *u;
-    p_session_entry e;
+    int                 i, rst_send_cnt = 0, valid_sess = 0;
+    frame_t            *fr;
+    tc_user_t          *u;
+    p_session_entry     e;
+    struct sockaddr_in  targ_addr;
+
+    memset(&targ_addr, 0, sizeof(targ_addr));
+    targ_addr.sin_family = AF_INET;
 
     if (s_table && s_table->num_of_sessions > 0) {
         if (user_array) {
             for (i = 0; i < size_of_users; i++) {
                 u = user_array + i;
                 if (!(u->state.status & SYN_CONFIRM)) {
-                    tc_log_info(LOG_NOTICE, 0, "connection fails:%u", 
-                            ntohs(u->src_port));
+                    targ_addr.sin_addr.s_addr = u->src_addr;
+                    tc_log_info(LOG_NOTICE, 0, "connection fails:%s:%u", 
+                            inet_ntoa(targ_addr.sin_addr), ntohs(u->src_port));
                 }
                 if (u->total_packets_sent < u->orig_session->frames) {
                     tc_log_debug3(LOG_DEBUG, 0, 

@@ -250,6 +250,9 @@ output_for_debug(int argc, char **argv)
     /* print out target info */
     tc_log_info(LOG_NOTICE, 0, "target:%s", clt_settings.raw_transfer);
 
+#if (GRYPHON_DEBUG)
+    tc_log_info(LOG_NOTICE, 0, "GRYPHON_DEBUG mode");
+#endif
 #if (GRYPHON_SINGLE)
     tc_log_info(LOG_NOTICE, 0, "GRYPHON_SINGLE mode");
 #endif
@@ -481,6 +484,20 @@ static int retrieve_real_servers()
 }
 
 
+static bool check_client_ip_valid(uint32_t ip)
+{
+    int   i;
+
+    for (i = 0; i < clt_settings.transfer.num; i++) {
+        if (ip == clt_settings.transfer.mappings[i]->target_ip) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 static int retrieve_client_ips() 
 {
     int          count = 0, len, i;
@@ -507,22 +524,23 @@ static int retrieve_client_ips()
             for (i = 1; i < 255; i++) {
                 sprintf(q, "%d", i);
                 ip = inet_addr(tmp_ip);
-                clt_settings.valid_ips[count++] = ip; 
-                if (count == M_CLIENT_IP_NUM) {
-                    tc_log_info(LOG_WARN, 0, "reach the limit for clt ips");
-                    break;
-
+                if (check_client_ip_valid(ip)) {
+                    clt_settings.valid_ips[count++] = ip; 
+                    if (count == M_CLIENT_IP_NUM) {
+                        tc_log_info(LOG_WARN, 0, "reach limit for clt ips");
+                        break;
+                    }
                 }
             }
         } else {
             ip = inet_addr(p);
-            clt_settings.valid_ips[count++] = ip; 
-            if (count == M_CLIENT_IP_NUM) {
-                tc_log_info(LOG_WARN, 0, "reach the limit for clt ips");
-                break;
-            }   
-
-
+            if (check_client_ip_valid(ip)) {
+                clt_settings.valid_ips[count++] = ip; 
+                if (count == M_CLIENT_IP_NUM) {
+                    tc_log_info(LOG_WARN, 0, "reach limit for clt ips");
+                    break;
+                }   
+            }
         }
 
         if (split != NULL) {
@@ -599,18 +617,19 @@ set_details()
         return -1;
     }
 
-    if (clt_settings.raw_clt_ips == NULL) {
-        tc_log_info(LOG_ERR, 0, "please set the -c parameter");
-        return -1;
-    }
-    retrieve_client_ips();
-
     /* set the ip port pair mapping according to settings */
     if (retrieve_target_addresses(clt_settings.raw_transfer,
                               &clt_settings.transfer) == -1)
     {
         return -1;
     }
+
+    if (clt_settings.raw_clt_ips == NULL) {
+        tc_log_info(LOG_ERR, 0, "please set the -c parameter");
+        return -1;
+    }
+    retrieve_client_ips();
+
 
     if (clt_settings.par_connections <= 0) {
         clt_settings.par_connections = 1;

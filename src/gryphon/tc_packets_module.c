@@ -157,7 +157,6 @@ record_packet(uint64_t key, unsigned char *frame, int frame_len, uint32_t seq,
             session->last_ack_seq = ack_seq;
         }
     }
-
 }
 
 
@@ -229,10 +228,9 @@ dispose_packet(unsigned char *frame, int frame_len, int ip_recv_len)
         saved = false;
 #endif
     } 
-    packets_considered_cnt++;
 
+    packets_considered_cnt++;
     key = tc_get_key(ip_header->saddr, tcp_header->source);
-    ack_seq = ntohl(tcp_header->ack_seq);
     ack_seq = ntohl(tcp_header->ack_seq);
     seq = ntohl(tcp_header->seq);
 
@@ -422,7 +420,7 @@ read_packets_from_pcap(char *pcap_file, char *filter)
     }
 
     pcap_close(pcap);
-    tc_log_info(LOG_INFO, 0, "total packets: %llu, needed packets:%llu", 
+    tc_log_info(LOG_INFO, 0, "total packets: %llu, clt packets:%llu", 
             packets_cnt, packets_considered_cnt);
     
 }

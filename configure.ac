@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([gryphon], [0.3.0], [wangbin579@gmail.com], [gryphon])
+AC_INIT([gryphon], [0.4.0], [wangbin579@gmail.com], [gryphon])
 AC_CONFIG_HEADER([src/core/config.h])
 AM_INIT_AUTOMAKE
 
