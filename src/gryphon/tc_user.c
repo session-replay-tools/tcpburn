@@ -113,7 +113,7 @@ tc_init_session_for_users()
     bool            is_find = false;
     int             i, index = 0;
     tc_user_t      *u;
-    p_session_entry e = NULL;
+    p_session_entry e = NULL, *aux_s_array;
     session_data_t *sess;
 
     if (s_table->num_of_sessions == 0) {
@@ -122,11 +122,17 @@ tc_init_session_for_users()
         return;
     }
 
+    aux_s_array = (p_session_entry *) calloc(s_table->num_of_sessions, 
+            sizeof(p_session_entry));
+    if (aux_s_array == NULL) {
+        tc_log_info(LOG_ERR, 0, "calloc error for aux_s_array");
+        tc_over = 1;
+        return;
+    }
+
     e = s_table->entries[index];
 
-    for (i = 0; i < size_of_users; i++) {
-        u = user_array + i;
-
+    for (i = 0; i < s_table->num_of_sessions; i++) {
         if (e == NULL) {
             is_find = false;
             do {
@@ -146,8 +152,24 @@ tc_init_session_for_users()
                     break;
                 }
             } while (e == NULL);
-        } 
+        }
+        
+        aux_s_array[i] = e;
+        e = e->next;
+        while (e != NULL) {
+            sess = &(e->data);
+            if (!sess->has_req) {
+                e = e->next;
+            } else {
+                break;
+            }
+        }
+    }
 
+    index = 0;
+    for (i = 0; i < size_of_users; i++) {
+        e = aux_s_array[index];
+        u = user_array + i;
         u->orig_session = &(e->data);
         u->orig_frame = u->orig_session->first_frame;
         u->orig_unack_frame = u->orig_session->first_frame;
@@ -155,22 +177,13 @@ tc_init_session_for_users()
         tc_log_debug3(LOG_DEBUG, 0, "index:%d,frames:%u, orig src port:%u", 
                 index, u->orig_session->frames, 
                 ntohs(u->orig_session->orig_src_port));
-
-        e = e->next;
-        while (e != NULL) {
-            sess = &(e->data);
-            if (!sess->has_req) {
-                e = e->next;
-            } else {
-                is_find = true;
-                break;
-            }
-        }
+        index = (index + 1) % s_table->num_of_sessions;
     }
 
     tc_log_info(LOG_NOTICE, 0, 
             "users:%d, sessions:%d, total packets needed sent:%llu",
             size_of_users, s_table->num_of_sessions, orig_clt_packs_cnt);
+    free(aux_s_array);
 }
 
 p_session_entry 
@@ -380,7 +393,7 @@ tc_build_users(int port_prioritized, int num_users, uint32_t *ips, int num_ip)
     }
 
     if (count < size_of_users) {
-        tc_log_info(LOG_WARN, 0, "insuffient ips:%d for creating users:%d", 
+        tc_log_info(LOG_ERR, 0, "insuffient ips:%d for creating users:%d", 
                 num_ip, size_of_users);
         tc_log_info(LOG_NOTICE, 0, "change users from %d to %d", 
                 size_of_users, count); 
