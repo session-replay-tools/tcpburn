@@ -256,6 +256,9 @@ output_for_debug(int argc, char **argv)
 #if (GRYPHON_SINGLE)
     tc_log_info(LOG_NOTICE, 0, "GRYPHON_SINGLE mode");
 #endif
+#if (GRYPHON_COMET)
+    tc_log_info(LOG_NOTICE, 0, "GRYPHON_COMET mode");
+#endif
 #if (GRYPHON_ADVANCED)
     tc_log_info(LOG_NOTICE, 0, "GRYPHON_ADVANCED mode");
 #endif

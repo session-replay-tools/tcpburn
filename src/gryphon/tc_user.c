@@ -1115,7 +1115,19 @@ void process_outgress(unsigned char *packet)
             u->exp_ack_seq = htonl(ntohl(u->exp_ack_seq) + 1);
             u->state.status  |= SERVER_FIN;
             send_faked_ack(u);
-            process_user_packet(u);
+            if (u->state.status & CLIENT_FIN) {
+                u->state.over = 1;
+            } else {
+#if (GRYPHON_COMET)
+                send_faked_rst(u);
+#else
+                if (u->orig_frame == NULL) {
+                    send_faked_rst(u);
+                } else {
+                    process_user_packet(u);
+                }
+#endif
+            }
             fin_recv_cnt++;
 
         } else if (tcp_header->rst) {
