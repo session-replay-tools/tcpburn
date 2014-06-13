@@ -527,6 +527,7 @@ static int retrieve_client_ips()
             for (i = 1; i < 255; i++) {
                 sprintf(q, "%d", i);
                 ip = inet_addr(tmp_ip);
+                tc_log_debug1(LOG_DEBUG, 0, "clt ip addr:%s", tmp_ip);
                 if (check_client_ip_valid(ip)) {
                     clt_settings.valid_ips[count++] = ip; 
                     if (count == M_CLIENT_IP_NUM) {
@@ -631,8 +632,10 @@ set_details()
         tc_log_info(LOG_ERR, 0, "please set the -c parameter");
         return -1;
     }
-    retrieve_client_ips();
+    
+    tc_log_info(LOG_NOTICE, 0, "client ips:%s", clt_settings.raw_clt_ips);
 
+    retrieve_client_ips();
 
     if (clt_settings.par_connections <= 0) {
         clt_settings.par_connections = 1;
