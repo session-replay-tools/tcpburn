@@ -23,7 +23,7 @@ static unsigned char *alloc_pool_mem(int length)
     p = clt_settings.mem_pool + clt_settings.mem_pool_index;
     clt_settings.mem_pool_index += length;
 
-    if (clt_settings.mem_pool_index >= clt_settings.mem_pool_size) {
+    if (clt_settings.mem_pool_index > clt_settings.mem_pool_size) {
         tc_log_info(LOG_ERR, 0, "pool full, calloc error for frame data");
         return NULL;
     }
