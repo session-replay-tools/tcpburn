@@ -1,0 +1,414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>LCOV - app.info - src/communication/tc_socket.c</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/communication</a> - tc_socket.c<span style="font-size: 80%;"> (source / <a href="tc_socket.c.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">app.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">73</td>
+            <td class="headerCovTableEntry">116</td>
+            <td class="headerCovTableEntryLo">62.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2014-08-01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntry">58</td>
+            <td class="headerCovTableEntryLo">39.7 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            :  </a>
+<span class="lineNum">       2 </span>                :            : #include &lt;xcopy.h&gt;
+<a name="3"><span class="lineNum">       3 </span>                :            : </a>
+<span class="lineNum">       4 </span>                :            : int
+<span class="lineNum">       5 </span>                :<span class="lineCov">          1 : tc_raw_socket_out_init()</span>
+<span class="lineNum">       6 </span>                :            : {
+<span class="lineNum">       7 </span>                :            :     int fd, n;
+<span class="lineNum">       8 </span>                :            : 
+<span class="lineNum">       9 </span>                :<span class="lineCov">          1 :     n = 1;</span>
+<span class="lineNum">      10 </span>                :            : 
+<span class="lineNum">      11 </span>                :            :     /*
+<span class="lineNum">      12 </span>                :            :      * On Linux when setting the protocol as IPPROTO_RAW,
+<span class="lineNum">      13 </span>                :            :      * then by default the kernel sets the IP_HDRINCL option and 
+<span class="lineNum">      14 </span>                :            :      * thus does not prepend its own IP header. 
+<span class="lineNum">      15 </span>                :            :      */
+<span class="lineNum">      16 </span>                :<span class="lineCov">          1 :     fd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);</span>
+<span class="lineNum">      17 </span>                :            : 
+<span class="lineNum">      18 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (fd == -1) {</span>
+<span class="lineNum">      19 </span>                :<span class="lineNoCov">          0 :         tc_log_info(LOG_ERR, errno, &quot;Create raw socket to output failed&quot;);</span>
+<span class="lineNum">      20 </span>                :<span class="lineNoCov">          0 :         return TC_INVALID_SOCKET;</span>
+<span class="lineNum">      21 </span>                :            :     } 
+<span class="lineNum">      22 </span>                :            : 
+<span class="lineNum">      23 </span>                :            :     /*
+<span class="lineNum">      24 </span>                :            :      * tell the IP layer not to prepend its own header.
+<span class="lineNum">      25 </span>                :            :      * It does not need setting for linux, but *BSD needs
+<span class="lineNum">      26 </span>                :            :      */
+<span class="lineNum">      27 </span>        [<span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (setsockopt(fd, IPPROTO_IP, IP_HDRINCL, &amp;n, sizeof(n)) &lt; 0) {</span>
+<span class="lineNum">      28 </span>                :<span class="lineNoCov">          0 :         tc_log_info(LOG_ERR, errno,</span>
+<span class="lineNum">      29 </span>                :            :                     &quot;Set raw socket(%d) option \&quot;IP_HDRINCL\&quot; failed&quot;, fd);
+<span class="lineNum">      30 </span>                :<span class="lineNoCov">          0 :         return TC_INVALID_SOCKET;</span>
+<span class="lineNum">      31 </span>                :            :     }
+<span class="lineNum">      32 </span>                :            : 
+<span class="lineNum">      33 </span>                :            : 
+<span class="lineNum">      34 </span>                :<span class="lineCov">          1 :     return fd;</span>
+<span class="lineNum">      35 </span>                :            : }
+<span class="lineNum">      36 </span>                :            : 
+<span class="lineNum">      37 </span>                :            : #if (TC_PCAP_SEND)
+<span class="lineNum">      38 </span>                :            : 
+<span class="lineNum">      39 </span>                :            : static pcap_t *pcap = NULL;
+<span class="lineNum">      40 </span>                :            : 
+<span class="lineNum">      41 </span>                :            : int
+<span class="lineNum">      42 </span>                :            : tc_pcap_send_init(char *if_name, int mtu)
+<span class="lineNum">      43 </span>                :            : {
+<span class="lineNum">      44 </span>                :            :     char  pcap_errbuf[PCAP_ERRBUF_SIZE];
+<span class="lineNum">      45 </span>                :            : 
+<span class="lineNum">      46 </span>                :            :     pcap_errbuf[0] = '\0';
+<span class="lineNum">      47 </span>                :            :     pcap = pcap_open_live(if_name, mtu + sizeof(struct ethernet_hdr), 
+<span class="lineNum">      48 </span>                :            :             0, 0, pcap_errbuf);
+<span class="lineNum">      49 </span>                :            :     if (pcap_errbuf[0] != '\0') {
+<span class="lineNum">      50 </span>                :            :         tc_log_info(LOG_ERR, errno, &quot;pcap open %s, failed:%s&quot;, 
+<span class="lineNum">      51 </span>                :            :                 if_name, pcap_errbuf);
+<span class="lineNum">      52 </span>                :            :         return TC_ERROR;
+<span class="lineNum">      53 </span>                :            :     }
+<span class="lineNum">      54 </span>                :            : 
+<span class="lineNum">      55 </span>                :            :     return TC_OK;
+<span class="lineNum">      56 </span>                :            : }
+<span class="lineNum">      57 </span>                :            : 
+<span class="lineNum">      58 </span>                :            : int
+<span class="lineNum">      59 </span>                :            : tc_pcap_send(unsigned char *frame, size_t len)
+<span class="lineNum">      60 </span>                :            : {
+<span class="lineNum">      61 </span>                :            :     int   send_len;
+<span class="lineNum">      62 </span>                :            :     char  pcap_errbuf[PCAP_ERRBUF_SIZE];
+<span class="lineNum">      63 </span>                :            : 
+<span class="lineNum">      64 </span>                :            :     pcap_errbuf[0]='\0';
+<span class="lineNum">      65 </span>                :            : 
+<span class="lineNum">      66 </span>                :            :     send_len = pcap_inject(pcap, frame, len);
+<span class="lineNum">      67 </span>                :            :     if (send_len == -1) {
+<span class="lineNum">      68 </span>                :            :         return TC_ERROR;
+<span class="lineNum">      69 </span>                :            :     }
+<span class="lineNum">      70 </span>                :            : 
+<span class="lineNum">      71 </span>                :            :     return TC_OK;
+<span class="lineNum">      72 </span>                :            : }
+<span class="lineNum">      73 </span>                :            : 
+<span class="lineNum">      74 </span>                :            : int tc_pcap_over()
+<span class="lineNum">      75 </span>                :            : {
+<span class="lineNum">      76 </span>                :            :     if (pcap != NULL) {
+<span class="lineNum">      77 </span>                :            :         pcap_close(pcap);
+<span class="lineNum">      78 </span>                :            :         pcap = NULL;
+<span class="lineNum">      79 </span>                :            :     }
+<span class="lineNum">      80 </span>                :            :      
+<span class="lineNum">      81 </span>                :            :     return TC_OK;
+<span class="lineNum">      82 </span>                :            : }
+<span class="lineNum">      83 </span>                :            : #endif
+<span class="lineNum">      84 </span>                :            : 
+<span class="lineNum">      85 </span>                :            : /*
+<span class="lineNum">      86 </span>                :            :  * send the ip packet to the remote test server
+<span class="lineNum">      87 </span>                :            :  * (It will not go through ip fragmentation)
+<span class="lineNum">      88 </span>                :            :  */
+<a name="89"><span class="lineNum">      89 </span>                :            : </a>
+<span class="lineNum">      90 </span>                :            : int
+<span class="lineNum">      91 </span>                :<span class="lineCov">    4099466 : tc_raw_socket_send(int fd, void *buf, size_t len, uint32_t ip)</span>
+<span class="lineNum">      92 </span>                :            : {
+<span class="lineNum">      93 </span>                :<span class="lineCov">    4099466 :     ssize_t             send_len, offset = 0, num_bytes;</span>
+<span class="lineNum">      94 </span>                :            :     const char         *ptr;
+<span class="lineNum">      95 </span>                :            :     struct sockaddr_in  dst_addr;
+<span class="lineNum">      96 </span>                :            : 
+<span class="lineNum">      97 </span>        [<span class="branchCov" title="Branch 0 was taken 4099466 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4099466 :     if (fd &gt; 0) {</span>
+<span class="lineNum">      98 </span>                :            : 
+<span class="lineNum">      99 </span>                :<span class="lineCov">    4099466 :         memset(&amp;dst_addr, 0, sizeof(struct sockaddr_in));</span>
+<span class="lineNum">     100 </span>                :            : 
+<span class="lineNum">     101 </span>                :<span class="lineCov">    4099466 :         dst_addr.sin_family = AF_INET;</span>
+<span class="lineNum">     102 </span>                :<span class="lineCov">    4099466 :         dst_addr.sin_addr.s_addr = ip;</span>
+<span class="lineNum">     103 </span>                :            : 
+<span class="lineNum">     104 </span>                :<span class="lineCov">    4099466 :         ptr = buf;</span>
+<span class="lineNum">     105 </span>                :            : 
+<span class="lineNum">     106 </span>                :            :         /*
+<span class="lineNum">     107 </span>                :            :          * The output packet will take a special path of IP layer
+<span class="lineNum">     108 </span>                :            :          * (raw_sendmsg-&gt;raw_send_hdrinc-&gt;NF_INET_LOCAL_OUT-&gt;...).
+<span class="lineNum">     109 </span>                :            :          * No IP fragmentation will take place if needed. 
+<span class="lineNum">     110 </span>                :            :          * This means that a raw packet larger than the MTU of the 
+<span class="lineNum">     111 </span>                :            :          * interface will probably be discarded. Instead ip_local_error(), 
+<span class="lineNum">     112 </span>                :            :          * which does general sk_buff cleaning, is called and an 
+<span class="lineNum">     113 </span>                :            :          * error EMSGSIZE is returned. 
+<span class="lineNum">     114 </span>                :            :          */
+<span class="lineNum">     115 </span>                :            :         do {
+<span class="lineNum">     116 </span>                :<span class="lineCov">    4099466 :             num_bytes = len - offset;</span>
+<span class="lineNum">     117 </span>                :<span class="lineCov">    4099466 :             send_len = sendto(fd, ptr + offset, num_bytes, 0, </span>
+<span class="lineNum">     118 </span>                :            :                     (struct sockaddr *) &amp;dst_addr, sizeof(dst_addr));
+<span class="lineNum">     119 </span>                :            : 
+<span class="lineNum">     120 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 4099466 times"> + </span>]:<span class="lineCov">    4099466 :             if (send_len == -1) {</span>
+<span class="lineNum">     121 </span>        [<span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span>]:<span class="lineNoCov">          0 :                 if (errno == EINTR) {</span>
+<span class="lineNum">     122 </span>                :<span class="lineNoCov">          0 :                     tc_log_info(LOG_NOTICE, errno, &quot;raw fd:%d EINTR&quot;, fd);</span>
+<span class="lineNum">     123 </span>        [<span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span>]:<span class="lineNoCov">          0 :                 } else if (errno == EAGAIN) {</span>
+<span class="lineNum">     124 </span>                :            :                     tc_log_debug1(LOG_NOTICE, errno, &quot;raw fd:%d EAGAIN&quot;, fd);
+<span class="lineNum">     125 </span>                :            :                 } else {
+<span class="lineNum">     126 </span>                :<span class="lineNoCov">          0 :                     tc_log_info(LOG_ERR, errno, &quot;raw fd:%d&quot;, fd);</span>
+<span class="lineNum">     127 </span>                :<span class="lineNoCov">          0 :                     tc_socket_close(fd);</span>
+<span class="lineNum">     128 </span>                :<span class="lineNoCov">          0 :                     return TC_ERROR;</span>
+<span class="lineNum">     129 </span>                :            :                 }   
+<span class="lineNum">     130 </span>                :            : 
+<span class="lineNum">     131 </span>                :            :             }  else {
+<span class="lineNum">     132 </span>                :<span class="lineCov">    4099466 :                 offset += send_len;</span>
+<span class="lineNum">     133 </span>                :            :             }   
+<span class="lineNum">     134 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 4099466 times"> + </span>]:<span class="lineCov">    4099466 :         } while (offset &lt; (ssize_t) len);</span>
+<span class="lineNum">     135 </span>                :            :     }
+<span class="lineNum">     136 </span>                :            : 
+<span class="lineNum">     137 </span>                :<span class="lineCov">    4099466 :     return TC_OK;</span>
+<span class="lineNum">     138 </span>                :            : }
+<span class="lineNum">     139 </span>                :            : 
+<a name="140"><span class="lineNum">     140 </span>                :            : </a>
+<span class="lineNum">     141 </span>                :            : int
+<span class="lineNum">     142 </span>                :<span class="lineCov">          2 : tc_socket_init()</span>
+<span class="lineNum">     143 </span>                :            : {
+<span class="lineNum">     144 </span>                :            :     int fd;
+<span class="lineNum">     145 </span>                :            :    
+<span class="lineNum">     146 </span>                :<span class="lineCov">          2 :     fd = socket(AF_INET, SOCK_STREAM, 0);</span>
+<span class="lineNum">     147 </span>                :            : 
+<span class="lineNum">     148 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (fd == -1) {</span>
+<span class="lineNum">     149 </span>                :<span class="lineNoCov">          0 :         tc_log_info(LOG_ERR, errno, &quot;Create socket failed&quot;);</span>
+<span class="lineNum">     150 </span>                :<span class="lineNoCov">          0 :         return TC_INVALID_SOCKET;</span>
+<span class="lineNum">     151 </span>                :            :     }
+<span class="lineNum">     152 </span>                :            : 
+<span class="lineNum">     153 </span>                :<span class="lineCov">          2 :     return fd;</span>
+<span class="lineNum">     154 </span>                :            : }
+<a name="155"><span class="lineNum">     155 </span>                :            : </a>
+<span class="lineNum">     156 </span>                :            : int
+<span class="lineNum">     157 </span>                :<span class="lineCov">          2 : tc_socket_set_nonblocking(int fd)</span>
+<span class="lineNum">     158 </span>                :            : {
+<span class="lineNum">     159 </span>                :            :     int flags;
+<span class="lineNum">     160 </span>                :            : 
+<span class="lineNum">     161 </span>                :<span class="lineCov">          2 :     flags = fcntl(fd, F_GETFL, 0);</span>
+<span class="lineNum">     162 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (flags &lt; 0) {</span>
+<span class="lineNum">     163 </span>                :<span class="lineNoCov">          0 :         return TC_ERROR;</span>
+<span class="lineNum">     164 </span>                :            :     }
+<span class="lineNum">     165 </span>                :            : 
+<span class="lineNum">     166 </span>        [<span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) &lt; 0) {</span>
+<span class="lineNum">     167 </span>                :<span class="lineNoCov">          0 :         return TC_ERROR;</span>
+<span class="lineNum">     168 </span>                :            :     }
+<span class="lineNum">     169 </span>                :            : 
+<span class="lineNum">     170 </span>                :<span class="lineCov">          2 :     return TC_OK;</span>
+<span class="lineNum">     171 </span>                :            : }
+<a name="172"><span class="lineNum">     172 </span>                :            : </a>
+<span class="lineNum">     173 </span>                :            : int
+<span class="lineNum">     174 </span>                :<span class="lineCov">          2 : tc_socket_set_nodelay(int fd)</span>
+<span class="lineNum">     175 </span>                :            : {
+<span class="lineNum">     176 </span>                :            :     int       flag;
+<span class="lineNum">     177 </span>                :            :     socklen_t len;
+<span class="lineNum">     178 </span>                :            : 
+<span class="lineNum">     179 </span>                :<span class="lineCov">          2 :     flag = 1;</span>
+<span class="lineNum">     180 </span>                :<span class="lineCov">          2 :     len = (socklen_t) sizeof(flag);</span>
+<span class="lineNum">     181 </span>                :            : 
+<span class="lineNum">     182 </span>        [<span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (char *) &amp;flag, len) == -1) { </span>
+<span class="lineNum">     183 </span>                :<span class="lineNoCov">          0 :         return TC_ERROR;</span>
+<span class="lineNum">     184 </span>                :            :     } 
+<span class="lineNum">     185 </span>                :            : 
+<span class="lineNum">     186 </span>                :<span class="lineCov">          2 :     return TC_OK;</span>
+<span class="lineNum">     187 </span>                :            : }
+<a name="188"><span class="lineNum">     188 </span>                :            : </a>
+<span class="lineNum">     189 </span>                :            : int
+<span class="lineNum">     190 </span>                :<span class="lineCov">          2 : tc_socket_connect(int fd, uint32_t ip, uint16_t port)</span>
+<span class="lineNum">     191 </span>                :            : {
+<span class="lineNum">     192 </span>                :            :     socklen_t           len;
+<span class="lineNum">     193 </span>                :            :     struct sockaddr_in  remote_addr;                           
+<span class="lineNum">     194 </span>                :            : 
+<span class="lineNum">     195 </span>                :<span class="lineCov">          2 :     tc_memzero(&amp;remote_addr, sizeof(remote_addr));               </span>
+<span class="lineNum">     196 </span>                :            : 
+<span class="lineNum">     197 </span>                :<span class="lineCov">          2 :     remote_addr.sin_family = AF_INET;                         </span>
+<span class="lineNum">     198 </span>                :<span class="lineCov">          2 :     remote_addr.sin_addr.s_addr = ip;                </span>
+<span class="lineNum">     199 </span>                :<span class="lineCov">          2 :     remote_addr.sin_port = htons(port);                       </span>
+<span class="lineNum">     200 </span>                :            : 
+<span class="lineNum">     201 </span>                :<span class="lineCov">          2 :     len = (socklen_t) (sizeof(remote_addr));</span>
+<span class="lineNum">     202 </span>                :            : 
+<span class="lineNum">     203 </span>        [<span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (connect(fd, (struct sockaddr *) &amp;remote_addr, len) == -1) {</span>
+<span class="lineNum">     204 </span>                :<span class="lineNoCov">          0 :         tc_log_info(LOG_ERR, errno, &quot;Can not connect to remote server(%s:%d)&quot;,</span>
+<span class="lineNum">     205 </span>                :            :                 inet_ntoa(remote_addr.sin_addr), port);
+<span class="lineNum">     206 </span>                :<span class="lineNoCov">          0 :         tc_socket_close(fd);</span>
+<span class="lineNum">     207 </span>                :<span class="lineNoCov">          0 :         return TC_ERROR;</span>
+<span class="lineNum">     208 </span>                :            :     } else {
+<span class="lineNum">     209 </span>                :<span class="lineCov">          2 :         tc_log_info(LOG_INFO, 0, &quot;connect to remote server(%s:%d)&quot;,</span>
+<span class="lineNum">     210 </span>                :            :                 inet_ntoa(remote_addr.sin_addr), port);
+<span class="lineNum">     211 </span>                :<span class="lineCov">          2 :         return TC_OK;</span>
+<span class="lineNum">     212 </span>                :            :     }
+<span class="lineNum">     213 </span>                :            : 
+<span class="lineNum">     214 </span>                :            : }
+<span class="lineNum">     215 </span>                :            : 
+<a name="216"><span class="lineNum">     216 </span>                :            : </a>
+<span class="lineNum">     217 </span>                :            : int
+<span class="lineNum">     218 </span>                :<span class="lineCov">     514991 : tc_socket_cmb_recv(int fd, int *num, char *buffer)</span>
+<span class="lineNum">     219 </span>                :            : {
+<span class="lineNum">     220 </span>                :<span class="lineCov">     514991 :     int     read_num = 0, cnt = 0;</span>
+<span class="lineNum">     221 </span>                :            :     size_t  last;
+<span class="lineNum">     222 </span>                :            :     ssize_t n, len;
+<span class="lineNum">     223 </span>                :            : 
+<span class="lineNum">     224 </span>                :<span class="lineCov">     514991 :     last = 0;</span>
+<span class="lineNum">     225 </span>                :<span class="lineCov">     514991 :     len = sizeof(uint16_t);</span>
+<span class="lineNum">     226 </span>                :            : 
+<span class="lineNum">     227 </span>                :            :     for ( ;; ) {
+<span class="lineNum">     228 </span>                :<span class="lineCov">    1029982 :         n = recv(fd, buffer + last, len, 0);</span>
+<span class="lineNum">     229 </span>                :            : 
+<span class="lineNum">     230 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1029982 times"> + </span>]:<span class="lineCov">    1029982 :         if (n == -1) {</span>
+<span class="lineNum">     231 </span>[<span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span>][<span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (errno == EAGAIN || errno == EINTR) {</span>
+<span class="lineNum">     232 </span>                :<span class="lineNoCov">          0 :                 cnt++;</span>
+<span class="lineNum">     233 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :                 if (cnt % MAX_READ_LOG_TRIES == 0) {</span>
+<span class="lineNum">     234 </span>                :<span class="lineNoCov">          0 :                     tc_log_info(LOG_ERR, 0, &quot;recv tries:%d,fd:%d&quot;, </span>
+<span class="lineNum">     235 </span>                :            :                             cnt, fd);
+<span class="lineNum">     236 </span>                :            :                 }
+<span class="lineNum">     237 </span>                :<span class="lineNoCov">          0 :                 continue;</span>
+<span class="lineNum">     238 </span>                :            :             } else {
+<span class="lineNum">     239 </span>                :<span class="lineNoCov">          0 :                 tc_log_info(LOG_NOTICE, errno, &quot;return -1,fd:%d&quot;, fd);</span>
+<span class="lineNum">     240 </span>                :<span class="lineNoCov">          0 :                 return TC_ERROR;</span>
+<span class="lineNum">     241 </span>                :            :             }
+<span class="lineNum">     242 </span>                :            :         }
+<span class="lineNum">     243 </span>                :            : 
+<span class="lineNum">     244 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1029982 times"> + </span>]:<span class="lineCov">    1029982 :         if (n == 0) {</span>
+<span class="lineNum">     245 </span>                :<span class="lineNoCov">          0 :             tc_log_info(LOG_NOTICE, 0, &quot;recv length 0,fd:%d&quot;, fd);</span>
+<span class="lineNum">     246 </span>                :<span class="lineNoCov">          0 :             return TC_ERROR;</span>
+<span class="lineNum">     247 </span>                :            :         }
+<span class="lineNum">     248 </span>                :            : 
+<span class="lineNum">     249 </span>                :<span class="lineCov">    1029982 :         last += n;</span>
+<span class="lineNum">     250 </span>                :            : 
+<span class="lineNum">     251 </span>                :            :         tc_log_debug1(LOG_DEBUG, 0, &quot;current len:%d&quot;, len);
+<span class="lineNum">     252 </span>[<span class="branchCov" title="Branch 0 was taken 514991 times"> + </span><span class="branchCov" title="Branch 1 was taken 514991 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 514991 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    1029982 :         if ((!read_num) &amp;&amp; last &gt;= sizeof(uint16_t)) {</span>
+<span class="lineNum">     253 </span>                :<span class="lineCov">     514991 :             *num = (int) ntohs(*(uint16_t *) buffer);</span>
+<span class="lineNum">     254 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 514991 times"> + </span>]:<span class="lineCov">     514991 :             if (*num &gt; COMB_MAX_NUM) {</span>
+<span class="lineNum">     255 </span>                :<span class="lineNoCov">          0 :                 tc_log_info(LOG_WARN, 0, &quot;num:%d larger than threshold&quot;, *num);</span>
+<span class="lineNum">     256 </span>                :<span class="lineNoCov">          0 :                 return TC_ERROR;</span>
+<span class="lineNum">     257 </span>                :            :             }
+<span class="lineNum">     258 </span>                :<span class="lineCov">     514991 :             read_num = 1;</span>
+<span class="lineNum">     259 </span>                :<span class="lineCov">     514991 :             len = ((*num) * MSG_SERVER_SIZE) + len;</span>
+<span class="lineNum">     260 </span>                :            :             tc_log_debug2(LOG_DEBUG, 0, &quot;all bytes needed reading:%d,num:%d&quot;,
+<span class="lineNum">     261 </span>                :            :                     len, *num);
+<span class="lineNum">     262 </span>                :            :         }
+<span class="lineNum">     263 </span>                :            : 
+<span class="lineNum">     264 </span>                :            :         tc_log_debug1(LOG_DEBUG, 0, &quot;this time reading:%d&quot;, n);
+<span class="lineNum">     265 </span>        [<span class="branchCov" title="Branch 0 was taken 514991 times"> + </span><span class="branchCov" title="Branch 1 was taken 514991 times"> + </span>]:<span class="lineCov">    1029982 :         if ((len -= n) == 0) {</span>
+<span class="lineNum">     266 </span>                :            :             tc_log_debug1(LOG_DEBUG, 0, &quot;remain readed:%d&quot;, len);
+<span class="lineNum">     267 </span>                :<span class="lineCov">     514991 :             break;</span>
+<span class="lineNum">     268 </span>                :            :         }
+<span class="lineNum">     269 </span>                :            : 
+<span class="lineNum">     270 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 514991 times"> + </span>]:<span class="lineCov">     514991 :         if (len &lt; 0) {</span>
+<span class="lineNum">     271 </span>                :<span class="lineNoCov">          0 :             tc_log_info(LOG_WARN, 0, &quot;read:%d,num packs:%d, remain:%d&quot;,</span>
+<span class="lineNum">     272 </span>                :            :                     n, *num, len);
+<span class="lineNum">     273 </span>                :<span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     274 </span>                :            :         }
+<span class="lineNum">     275 </span>                :            :         tc_log_debug1(LOG_DEBUG, 0, &quot;remain readed:%d&quot;, len);
+<span class="lineNum">     276 </span>                :<span class="lineCov">     514991 :     }</span>
+<span class="lineNum">     277 </span>                :            : 
+<span class="lineNum">     278 </span>                :<span class="lineCov">     514991 :     return TC_OK;</span>
+<span class="lineNum">     279 </span>                :            : }
+<a name="280"><span class="lineNum">     280 </span>                :            : </a>
+<span class="lineNum">     281 </span>                :            : int
+<span class="lineNum">     282 </span>                :<span class="lineCov">          2 : tc_socket_send(int fd, char *buffer, int len)</span>
+<span class="lineNum">     283 </span>                :            : {
+<span class="lineNum">     284 </span>                :<span class="lineCov">          2 :     int         cnt = 0;</span>
+<span class="lineNum">     285 </span>                :<span class="lineCov">          2 :     ssize_t     send_len, offset = 0, num_bytes;</span>
+<span class="lineNum">     286 </span>                :            :     const char *ptr;
+<span class="lineNum">     287 </span>                :            : 
+<span class="lineNum">     288 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (len &lt;= 0) {</span>
+<span class="lineNum">     289 </span>                :<span class="lineNoCov">          0 :         return TC_OK;</span>
+<span class="lineNum">     290 </span>                :            :     }
+<span class="lineNum">     291 </span>                :            : 
+<span class="lineNum">     292 </span>                :<span class="lineCov">          2 :     ptr = buffer;</span>
+<span class="lineNum">     293 </span>                :<span class="lineCov">          2 :     num_bytes = len - offset;</span>
+<span class="lineNum">     294 </span>                :            : 
+<span class="lineNum">     295 </span>                :            :     do {
+<span class="lineNum">     296 </span>                :            : 
+<span class="lineNum">     297 </span>                :<span class="lineCov">          2 :         send_len = send(fd, ptr + offset, num_bytes, 0);</span>
+<span class="lineNum">     298 </span>                :            : 
+<span class="lineNum">     299 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :         if (send_len == -1) {</span>
+<span class="lineNum">     300 </span>                :            : 
+<span class="lineNum">     301 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (cnt &gt; MAX_WRITE_TRIES) {</span>
+<span class="lineNum">     302 </span>                :<span class="lineNoCov">          0 :                 tc_log_info(LOG_ERR, 0, &quot;send timeout,fd:%d&quot;, fd);</span>
+<span class="lineNum">     303 </span>                :<span class="lineNoCov">          0 :                 return TC_ERROR;</span>
+<span class="lineNum">     304 </span>                :            :             }
+<span class="lineNum">     305 </span>        [<span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (errno == EINTR) {</span>
+<span class="lineNum">     306 </span>                :<span class="lineNoCov">          0 :                 tc_log_info(LOG_NOTICE, errno, &quot;fd:%d EINTR&quot;, fd);</span>
+<span class="lineNum">     307 </span>                :<span class="lineNoCov">          0 :                 cnt++;</span>
+<span class="lineNum">     308 </span>        [<span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span>]:<span class="lineNoCov">          0 :             } else if (errno == EAGAIN) {</span>
+<span class="lineNum">     309 </span>                :            :                 tc_log_debug1(LOG_NOTICE, errno, &quot;fd:%d EAGAIN&quot;, fd);
+<span class="lineNum">     310 </span>                :<span class="lineNoCov">          0 :                 cnt++;</span>
+<span class="lineNum">     311 </span>                :            :             } else {
+<span class="lineNum">     312 </span>                :<span class="lineNoCov">          0 :                 tc_log_info(LOG_ERR, errno, &quot;fd:%d&quot;, fd);</span>
+<span class="lineNum">     313 </span>                :<span class="lineNoCov">          0 :                 return TC_ERROR;</span>
+<span class="lineNum">     314 </span>                :            :             }
+<span class="lineNum">     315 </span>                :            :         } else {
+<span class="lineNum">     316 </span>                :            : 
+<span class="lineNum">     317 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :             if (send_len != num_bytes) {</span>
+<span class="lineNum">     318 </span>                :<span class="lineNoCov">          0 :                 tc_log_info(LOG_WARN, 0, &quot;fd:%d, slen:%ld, bsize:%ld&quot;,</span>
+<span class="lineNum">     319 </span>                :            :                         fd, send_len, num_bytes);
+<span class="lineNum">     320 </span>                :            :             }
+<span class="lineNum">     321 </span>                :            : 
+<span class="lineNum">     322 </span>                :<span class="lineCov">          2 :             offset += send_len;</span>
+<span class="lineNum">     323 </span>                :<span class="lineCov">          2 :             num_bytes -= send_len;</span>
+<span class="lineNum">     324 </span>                :            :         }
+<span class="lineNum">     325 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     } while (offset &lt; len);</span>
+<span class="lineNum">     326 </span>                :            : 
+<span class="lineNum">     327 </span>                :<span class="lineCov">          2 :     return TC_OK;</span>
+<span class="lineNum">     328 </span>                :            : }
+<span class="lineNum">     329 </span>                :            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.9</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
