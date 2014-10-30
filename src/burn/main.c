@@ -73,7 +73,7 @@ usage(void)
     printf("-i <num>       connection init speed fact(default 1024 connectins per second)\n");
     printf("-S <num>       MSS value sent back(default 1460)\n");
     printf("-C <num>       parallel connections between burn and intercept.\n"
-           "               The maximum value allowed is 16(default 3 connections since 0.8.0)\n");
+           "               The maximum value allowed is 16(default 2 connections)\n");
     printf("-s <server,>   intercept server list\n"
            "               Format:\n"
            "               ip_addr1:port1, ip_addr2:port2, ...\n");
