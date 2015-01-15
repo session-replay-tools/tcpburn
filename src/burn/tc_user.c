@@ -1521,6 +1521,11 @@ process_outgress(unsigned char *packet)
 
     if (u != NULL) {
 
+        if (!(u->state.status & SYN_SENT)) {
+            tc_log_info(LOG_NOTICE, 0, "abnormal resp packets");
+            return;
+        }
+
         tc_log_debug_trace(LOG_DEBUG, 0, BACKEND_FLAG, ip, tcp);
         u->srv_window = ntohs(tcp->window);
         if (u->wscale) {
