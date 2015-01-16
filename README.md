@@ -119,7 +119,8 @@ The only operation needed in the target server for TCPBurn is setting appropriat
     4) For comet applications, exclude publish sessions if they exist in pcap files.
     5) tcpburn could not replay TCP-based sessions that could not be replayed, 
        such as SSL/TLS sessions
-    6) Please execute "./tcpburn -h" or "./intercept -h" for more details.
+    6) ip_forward should not be set on the assistant server.
+    7) Please execute "./tcpburn -h" or "./intercept -h" for more details.
 
 
 ##Release History
