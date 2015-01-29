@@ -266,6 +266,8 @@ output_for_debug()
     tc_log_info(LOG_NOTICE, 0, "tcpburn version:%s", VERSION);
     /* print out target info */
     tc_log_info(LOG_NOTICE, 0, "target:%s", clt_settings.raw_transfer);
+    /* print pcap version for debug */
+    tc_log_info(LOG_NOTICE, 0, "pcap version:%s", pcap_lib_version());
 
 #if (TC_DEBUG)
     tc_log_info(LOG_NOTICE, 0, "TC_DEBUG mode");
