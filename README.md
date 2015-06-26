@@ -50,7 +50,7 @@ The only operation needed in the target server for TCPBurn is setting appropriat
       make
       make install
 	
-    b) Running intercept on the assistant server(root privilege is required)：
+    b) Running intercept on the assistant server(root privilege or the CAP_NET_RAW capability is required):
 
       ./intercept -F <filter> -i <device,> 
 	
@@ -77,7 +77,7 @@ The only operation needed in the target server for TCPBurn is setting appropriat
       route add -net 62.135.200.0 netmask 255.255.255.0 gw 65.135.233.161
 
 
-###3) tcpburn
+###3) tcpburn (root privilege or the CAP_NET_RAW capability is required when running)
     a) Install tcpburn on the test server
     git clone git://github.com/session-replay-tools/tcpburn.git
     cd tcpburn
@@ -120,7 +120,8 @@ The only operation needed in the target server for TCPBurn is setting appropriat
     5) tcpburn could not replay TCP-based sessions that could not be replayed, 
        such as SSL/TLS sessions
     6) ip_forward should not be set on the assistant server.
-    7) Please execute "./tcpburn -h" or "./intercept -h" for more details.
+    7) Root privilege or the CAP_NET_RAW capability is required
+    8) Please execute "./tcpburn -h" or "./intercept -h" for more details.
 
 
 ##Release History
