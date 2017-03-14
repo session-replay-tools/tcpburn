@@ -39,6 +39,7 @@ typedef struct tc_buf_s         tc_buf_t;
 
 #define TC_MAX_ALLOC_FROM_POOL  (tc_pagesize - 1)
 #define TC_DEFAULT_POOL_SIZE    (16 * 1024)
+#define TC_DEFAULT_LR_POOL_SIZE (4 *1024 * 1024)
 #define TC_POOL_ALIGNMENT       16
 #define TC_MIN_POOL_SIZE                                                     \
             tc_align((sizeof(tc_pool_t) + 2 * sizeof(tc_pool_large_t)),      \

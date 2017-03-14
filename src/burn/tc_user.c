@@ -50,7 +50,7 @@ table_index(uint32_t h, uint32_t len)
 int 
 tc_build_sess_table(int size)
 {
-    g_pool = tc_create_pool(TC_DEFAULT_POOL_SIZE, 0);
+    g_pool = tc_create_pool(TC_DEFAULT_LR_POOL_SIZE, 0);
 
     if (g_pool == NULL) {
         return TC_ERROR;
