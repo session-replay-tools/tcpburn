@@ -1,11 +1,11 @@
 # A tcp stream replay tool devoted to concurrentcy
 
 
-##Description
+## Description
 TCPBurn is a replay tool which focuses on concurrency. All TCP-based applications which could be replayed could be stressed by this powerful tool .
 
 
-##Characteristics
+## Characteristics
     1) Network latency could be reserved
     2) No need to bind multiple IP addresses and the number of client IP addresses 
        is unlimited
@@ -14,13 +14,13 @@ TCPBurn is a replay tool which focuses on concurrency. All TCP-based application
     4) Only TCP-based applications that could be replayed are supported
 
 
-##Scenarios
+## Scenarios
     1) Stress testing 
     2) Comet
     3) Performance testing
 
 
-##Architecture
+## Architecture
 
 ![tcpburn](https://raw.github.com/wangbin579/auxiliary/master/images/tcpburn.GIF)
 
@@ -33,16 +33,16 @@ The only operation needed in the target server for TCPBurn is setting appropriat
 *intercept* is responsible for passing the response header to *tcpburn*. By capturing the response packets, intercept will extract response header information and send the response header to *tcpburn* using a special channel(purple arrows). When *tcpburn* receives the response header, it utilizes the header information to modify the attributes of pcap packets and continues to send another packet. It should be noticed that the responses from the target server are routed to the assistant server which should act as a black hole.
 
 
-##tcpburn configure Options
+## tcpburn configure Options
     --with-debug      compile tcpburn with debug support (saved in a log file)
     --pcap-send       send packets at the data link layer instead of the IP layer
     --single          if intercept is configured with "--single" option, so does tcpburn
     --comet           replay for comet applications
 
 
-##Installation and Running
+## Installation and Running
 
-###1) intercept
+### 1) intercept
     a) Install intercept on the assistant server
       git clone git://github.com/session-replay-tools/intercept.git
       cd intercept
@@ -64,7 +64,7 @@ The only operation needed in the target server for TCPBurn is setting appropriat
       listens on port 80 from device eth0 
 
 
-###2) Set route commands on the target server which runs server applications
+### 2) Set route commands on the target server which runs server applications
 
       Set route commands appropriately to route response packets to the assistant server
 	
@@ -77,7 +77,7 @@ The only operation needed in the target server for TCPBurn is setting appropriat
       route add -net 62.135.200.0 netmask 255.255.255.0 gw 65.135.233.161
 
 
-###3) tcpburn (root privilege or the CAP_NET_RAW capability is required when running)
+### 3) tcpburn (root privilege or the CAP_NET_RAW capability is required when running)
     a) Install tcpburn on the test server
     git clone git://github.com/session-replay-tools/tcpburn.git
     cd tcpburn
@@ -109,7 +109,7 @@ The only operation needed in the target server for TCPBurn is setting appropriat
     information.
 
 
-##Note
+## Note
     1) All sessions are retrieved from pcap files and make sure the sessions in pcap files 
        are complete.
     2) tcpburn uses raw socket to send packets by default, and if you want to avoid 
@@ -124,11 +124,11 @@ The only operation needed in the target server for TCPBurn is setting appropriat
     8) Please execute "./tcpburn -h" or "./intercept -h" for more details.
 
 
-##Release History
+## Release History
 + 2014.09  v1.0    TCPBurn released
 
 
-##Bugs and feature requests
+## Bugs and feature requests
 Have a bug or a feature request? [Please open a new issue](https://github.com/session-replay-tools/tcpburn/issues). Before opening any issue, please search for existing issues.
 
 
