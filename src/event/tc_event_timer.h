@@ -71,7 +71,9 @@ tc_event_add_timer(tc_pool_t *pool, tc_event_timer_t *ev, tc_msec_t timer,
 
     if (ev == NULL && pool != NULL) {
         ev = (tc_event_timer_t *) tc_palloc(pool, sizeof(tc_event_timer_t));
-        ev->pool = pool;
+        if (ev) {
+            ev->pool = pool;
+        }
     }
 
     if (ev != NULL) {

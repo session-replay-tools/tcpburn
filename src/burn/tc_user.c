@@ -1206,11 +1206,12 @@ process_user_packet(tc_user_t *u)
     while (true) {
         if (u->orig_frame->frame_len > MAX_FRAME_LENGTH) {
             tc_log_info(LOG_NOTICE, 0, " frame length may be damaged");
+        } else {
+            memcpy(frame, u->orig_frame->frame_data, u->orig_frame->frame_len);
+            process_packet(u, frame, true);
+            u->total_packets_sent++;
         }
 
-        memcpy(frame, u->orig_frame->frame_data, u->orig_frame->frame_len);
-        process_packet(u, frame, true);
-        u->total_packets_sent++;
         u->orig_frame = u->orig_frame->next;
 
         if (send_stop(u, true)) {
@@ -1452,6 +1453,7 @@ retrieve_options(tc_user_t *u, int direction, tc_tcph_t *tcp)
                 }
                 u->wscale = (uint16_t) p[2];
                 p += opt_len;
+                break;
             case TCPOPT_TIMESTAMP:
                 if ((p + 1) >= end) {
                     return;
@@ -1480,6 +1482,7 @@ retrieve_options(tc_user_t *u, int direction, tc_tcph_t *tcp)
                     u->ts_value = ts_value;
                 }
                 p += opt_len;
+                break;
             case TCPOPT_NOP:
                 p = p + 1; 
                 break;                      

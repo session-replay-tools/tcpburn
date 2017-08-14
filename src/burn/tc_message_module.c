@@ -18,27 +18,35 @@ tc_message_init(tc_event_loop_t *event_loop, uint32_t ip, uint16_t port)
     }
 
     if (tc_socket_connect(fd, ip, port) == TC_ERROR) {
+        tc_socket_close(fd);
         return TC_INVALID_SOCKET;
     }
 
     if (tc_socket_set_nodelay(fd) == TC_ERROR) {
+        tc_socket_close(fd);
         return TC_INVALID_SOCKET;
     }
     if (tc_socket_set_nonblocking(fd) == TC_ERROR) {
+        tc_socket_close(fd);
         return TC_INVALID_SOCKET;
     }
 
     len = (socklen_t) sizeof(struct timeval);
-    setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, len);
+    if (setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, len) == -1) {
+        tc_socket_close(fd);
+        return TC_INVALID_SOCKET;
+    }
 
     ev = tc_event_create(event_loop->pool, fd, tc_process_server_msg, NULL);
     if (ev == NULL) {
+        tc_socket_close(fd);
         return TC_INVALID_SOCKET;
     }
 
     clt_settings.ev[fd] = ev; 
 
     if (tc_event_add(event_loop, ev, TC_EVENT_READ) == TC_EVENT_ERROR) {
+        tc_socket_close(fd);
         return TC_INVALID_SOCKET;
     }
 
@@ -48,9 +56,9 @@ tc_message_init(tc_event_loop_t *event_loop, uint32_t ip, uint16_t port)
 static int
 tc_process_server_msg(tc_event_t *rev)
 {
-    int            i, j, num, k;
+    int            i, j, k, num = 0;
     connections_t *connections;
-    unsigned char *p, aggr_resp[COMB_LENGTH + sizeof(uint16_t)];
+    unsigned char *p, aggr_resp[COMB_LENGTH + sizeof(uint16_t)] = {0};
 
 
     if (tc_socket_cmb_recv(rev->fd, &num, (char *) aggr_resp) == TC_ERROR)

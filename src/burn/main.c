@@ -611,7 +611,7 @@ retrieve_pcap_files()
             *split = '\0';
         }
 
-        strcpy(clt_settings.pcap_files[count++].file, p);
+        strncpy(clt_settings.pcap_files[count++].file, p, FILE_NAME_LEN - 1);
         if (split != NULL) {
             *split = ',';
         }

@@ -25,6 +25,7 @@ tc_raw_socket_out_init()
      * It does not need setting for linux, but *BSD needs
      */
     if (setsockopt(fd, IPPROTO_IP, IP_HDRINCL, &n, sizeof(n)) < 0) {
+        tc_socket_close(fd);
         tc_log_info(LOG_ERR, errno,
                     "Set raw socket(%d) option \"IP_HDRINCL\" failed", fd);
         return TC_INVALID_SOCKET;

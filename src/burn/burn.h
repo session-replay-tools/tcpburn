@@ -3,8 +3,9 @@
 
 #define LOCALHOST (inet_addr("127.0.0.1"))
 
+#define FILE_NAME_LEN 256
 typedef struct {
-    char file[256];
+    char file[FILE_NAME_LEN];
 } tc_pcap_file;
 
 typedef struct {
