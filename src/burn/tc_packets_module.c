@@ -232,6 +232,12 @@ dispose_packet(unsigned char *frame, int frame_len, int ip_recv_len)
     ip   = (tc_iph_t *) packet;
 
     packets_cnt++;
+
+    if (ip->version != 4) {
+        tc_log_info(LOG_INFO, 0, "ip version: %d", ip->version);
+        return TC_ERROR;
+    }
+
     if (ip->protocol != IPPROTO_TCP) {
         return TC_ERROR;
     }    
