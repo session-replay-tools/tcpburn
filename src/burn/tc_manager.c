@@ -194,6 +194,9 @@ burn_init(tc_event_loop_t *event_loop)
                 clt_settings.filter);
     }
 
+    if (clt_settings.reset_connection) {
+        return TC_ERROR;
+    }
 #if (TC_TOPO)
     set_topo_for_sess();
 #endif

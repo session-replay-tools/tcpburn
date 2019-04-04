@@ -95,6 +95,7 @@ typedef struct xcopy_clt_settings {
 
     unsigned int  target_localhost:1;
     unsigned int  ignite_complete:1;
+    unsigned int  reset_connection:1;
     unsigned int  do_daemonize:1;       /* daemon flag */
     unsigned int  percentage:7;         /* percentage of the full flow that 
                                            will be tranfered to the backend */

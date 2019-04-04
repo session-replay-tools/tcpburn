@@ -211,6 +211,113 @@ record_packet(uint64_t key, unsigned char *frame, int frame_len, uint32_t seq,
     }
 }
 
+static void 
+send_faked_rst(tc_iph_t  *orig_ip, tc_tcph_t *orig_tcp)
+{
+    tc_iph_t       *ip;
+    tc_tcph_t      *tcp;
+    unsigned char  *p, frame[FAKE_FRAME_LEN];
+
+    memset(frame, 0, FAKE_FRAME_LEN);
+    p = frame + ETHERNET_HDR_LEN;
+    ip  = (tc_iph_t *) p;
+    tcp = (tc_tcph_t *) (p + IP_HEADER_LEN);
+
+    ip->version  = 4;
+    ip->ihl      = IP_HEADER_LEN/4;
+    ip->frag_off = htons(IP_DF); 
+    ip->ttl      = 64; 
+    ip->protocol = IPPROTO_TCP;
+    ip->tot_len  = htons(FAKE_MIN_IP_DATAGRAM_LEN);
+    ip->saddr    = orig_ip->saddr;
+    ip->daddr    = orig_ip->daddr;
+    tcp->source  = orig_tcp->source;
+    tcp->dest    = orig_tcp->dest;
+
+    uint16_t size_ip = orig_ip->ihl << 2;
+    uint16_t size_tcp = orig_tcp->doff << 2;
+    uint16_t tot_len  = ntohs(orig_ip->tot_len);
+    uint16_t cont_len = tot_len - size_tcp - size_ip;
+    uint32_t expect_seq;
+
+    if (cont_len > 0) {
+        expect_seq = ntohl(orig_tcp->seq) +  cont_len;
+    } else if (orig_tcp->syn || orig_tcp->fin) {
+        tc_log_info(LOG_INFO, 0, "tcp syn or fin  is true");
+        expect_seq = ntohl(orig_tcp->seq) +  1;
+    } else {
+        expect_seq = ntohl(orig_tcp->seq);
+    }
+
+    tcp->seq     = htonl(expect_seq);
+    tcp->ack_seq = 0;
+
+    tcp->window  = 65535; 
+    tcp->rst     = 1;
+    tcp->doff    = TCP_HEADER_DOFF_MIN_VALUE;
+
+    tot_len = FAKE_MIN_IP_DATAGRAM_LEN;
+
+    usleep(10000);
+
+    tc_log_trace(LOG_NOTICE, 0, CLIENT_FLAG, ip, tcp);
+
+    tcp->check = 0; 
+    tcp->check = tcpcsum((unsigned char *) ip,
+            (unsigned short *) tcp, (int) (tot_len - size_ip));
+
+    tc_raw_socket_send(tc_raw_socket_out, ip, tot_len, ip->daddr);
+
+}
+
+static int
+reset_packet(unsigned char *frame, int frame_len, int ip_recv_len)
+{
+    uint16_t         size_ip, size_tcp;
+    unsigned char   *packet;
+    tc_iph_t  *ip;
+    tc_tcph_t *tcp;
+
+    packet = frame +  ETHERNET_HDR_LEN;
+
+    ip   = (tc_iph_t *) packet;
+
+    packets_cnt++;
+
+    if (ip->version != 4) {
+        tc_log_info(LOG_INFO, 0, "ip version: %d", ip->version);
+        return TC_ERROR;
+    }
+
+    if (ip->protocol != IPPROTO_TCP) {
+        return TC_ERROR;
+    }    
+
+    size_ip = ip->ihl << 2;
+    if (size_ip < 20) {
+        tc_log_info(LOG_WARN, 0, "Invalid IP header length: %d", size_ip);
+        return TC_ERROR;
+    }
+    tcp  = (tc_tcph_t *) ((char *) ip + size_ip);
+    size_tcp    = tcp->doff << 2;
+
+    if (size_tcp < 20) {
+        tc_log_info(LOG_INFO, 0, "Invalid TCP header len: %d bytes", size_tcp);
+        return TC_ERROR;
+    }
+
+
+    tc_log_trace(LOG_NOTICE, 0, CLIENT_FLAG, ip, tcp);
+
+    if (tcp->syn) {
+        return TC_OK;
+    }
+
+    send_faked_rst(ip, tcp);
+
+    return TC_OK;
+}
+
 
 static int
 dispose_packet(unsigned char *frame, int frame_len, int ip_recv_len)
@@ -454,8 +561,13 @@ read_packets_from_pcap(char *pcap_file, char *filter)
                     tc_log_debug2(LOG_DEBUG, 0, "frame len:%d, ip len:%d",
                             pkt_hdr.len, ip_pack_len);
                     frame = ip_data - ETHERNET_HDR_LEN;
-                    dispose_packet(frame, ip_pack_len + ETHERNET_HDR_LEN,
-                            ip_pack_len);
+                    if (clt_settings.reset_connection) {
+                        reset_packet(frame, ip_pack_len + ETHERNET_HDR_LEN,
+                                ip_pack_len);
+                    } else {
+                        dispose_packet(frame, ip_pack_len + ETHERNET_HDR_LEN,
+                                ip_pack_len);
+                    }
 
                     if (first) {
                         first_pack_time = pkt_hdr.ts;

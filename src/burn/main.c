@@ -752,6 +752,7 @@ settings_init()
     clt_settings.srv_port = SERVER_PORT;
     clt_settings.port_seed = 0;
     clt_settings.par_connections = 2;
+    clt_settings.reset_connection = 1;
 #if (TC_TOPO)
     clt_settings.topo_time_diff = 6000;
 #endif
