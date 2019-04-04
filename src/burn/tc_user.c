@@ -159,11 +159,9 @@ tc_init_sess_for_users()
 static void
 tc_init_sess_for_users()
 {
-    bool          is_find = false;
     int           i, index = 0;
     tc_user_t    *u;
     tc_pool_t    *pool;
-    sess_data_t  *sess;
     p_sess_entry  e, *aux_s_array;
 
     if (s_table->num_of_sess == 0) {
@@ -187,21 +185,10 @@ tc_init_sess_for_users()
 
     for (i = 0; i < s_table->num_of_sess; i++) {
         if (e == NULL) {
-            is_find = false;
             do {
                 index = (index + 1) % (s_table->size);
                 e = s_table->entries[index];
-                while (e != NULL) {
-                    sess = &(e->data);
-                    if (!sess->has_req) {
-                        e = e->next;
-                    } else {
-                        is_find = true;
-                        break;
-                    }
-                }
-
-                if (is_find) {
+                if (e != NULL) {
                     break;
                 }
             } while (e == NULL);
@@ -209,14 +196,6 @@ tc_init_sess_for_users()
         
         aux_s_array[i] = e;
         e = e->next;
-        while (e != NULL) {
-            sess = &(e->data);
-            if (!sess->has_req) {
-                e = e->next;
-            } else {
-                break;
-            }
-        }
     }
 
     index = 0;
