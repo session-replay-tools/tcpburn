@@ -131,7 +131,10 @@ The only operation needed in the target server for TCPBurn is setting appropriat
 ## Bugs and feature requests
 Have a bug or a feature request? [Please open a new issue](https://github.com/session-replay-tools/tcpburn/issues). Before opening any issue, please search for existing issues.
 
+## Technical support
+
+![tcpcopy](https://raw.github.com/wangbin579/auxiliary/master/images/tcp_analysis.png)
 
 ## Copyright and license
 
-Copyright 2014 under [the BSD license](LICENSE).
+Copyright 2019 under [the BSD license](LICENSE).
