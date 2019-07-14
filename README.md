@@ -79,34 +79,35 @@ The only operation needed in the target server for TCPBurn is setting appropriat
 
 ### 3) tcpburn (root privilege or the CAP_NET_RAW capability is required when running)
     a) Install tcpburn on the test server
-    git clone git://github.com/session-replay-tools/tcpburn.git
-    cd tcpburn
+      git clone git://github.com/session-replay-tools/tcpburn.git
+      cd tcpburn
 
-    if not comet scenarios
-      ./configure --single 
-    else
-      ./configure --single --comet  
-    endif
+      if not comet scenarios
+        ./configure --single 
+      else
+        ./configure --single --comet  
+      endif
 
-    make
-    make install
+      make
+      make install
+    
+    b) Running tcpburn on the test server(root privilege or the CAP_NET_RAW capability is required):
+      ./tcpburn -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> 
+                -s <intercept address> -u <user num> -c <ip range,>
+
+      For example:
 	
-    ./tcpburn -x historyServerPort-targetServerIP:targetServerPort -f <pcapfile,> 
-     -s <intercept address> -u <user num> -c <ip range,>
-
-    For example:
-	
-    Assume 65.135.233.160 is the IP address of the target server and 10.110.10.161 is the
-    internal IP address of the assistant server and 65.135.233.161 is the external IP 
-    address of the assistant server.
-      ./tcpburn -x 80-65.135.233.160:80 -f /path/to/80.pcap -s 10.110.10.161 
-       -u 10000 -c 62.135.200.x
+      Assume 65.135.233.160 is the IP address of the target server and 10.110.10.161 is the
+      internal IP address of the assistant server and 65.135.233.161 is the external IP 
+      address of the assistant server.
+        ./tcpburn -x 80-65.135.233.160:80 -f /path/to/80.pcap -s 10.110.10.161 
+                  -u 10000 -c 62.135.200.x
     
       tcpburn extracts packets from 80.pcap file on dst port 80 and replays these to the
-    target server 65.135.233.160 which runs the application listening on port 80. Total 
-    sessions replayed are 10000 and client IP addresses used are belonging to 62.135.200.x
-    series. tcpburn connects to the assistant server(10.110.10.161) for asking response 
-    information.
+      target server 65.135.233.160 which runs the application listening on port 80. Total 
+      sessions replayed are 10000 and client IP addresses used are belonging to 62.135.200.x
+      series. tcpburn connects to the assistant server(10.110.10.161) for asking response 
+      information.
 
 
 ## Note
