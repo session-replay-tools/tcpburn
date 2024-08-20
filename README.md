@@ -30,7 +30,7 @@ As shown in the figure above, TCPBurn consists of two components: `tcpburn` and 
 The only action required on the target server for TCPBurn is to set appropriate route commands to direct response packets (indicated by light green arrows) to the assistant server. Note that the assistant server should act as a black hole for responses from the target server.
 
 
-## tcpburn configure Options
+## `tcpburn` Configure Options
 - `--with-debug`      Compile `tcpburn` with debug support (output saved in a log file).
 - `--pcap-send`       Send packets at the data link layer instead of the IP layer.
 - `--single`          If `intercept` is configured with the `--single` option, use this option for `tcpburn` as well.
