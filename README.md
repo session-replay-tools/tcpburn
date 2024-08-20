@@ -96,7 +96,7 @@ You would use the following command:
 
 `./tcpburn -x 80-65.135.233.160:80 -f /path/to/80.pcap -s 10.110.10.161 -u 10000 -c 62.135.200.x`
     
-TCPBurn extracts packets from the `80.pcap` file, destined for port 80, and replays them to the target server at **65.135.233.160**, where an application listens on port 80. It replays a total of 10,000 sessions, using client IP addresses from the **62.135.200.x** range. TCPBurn connects to the assistant server at **10.110.10.161** to obtain response information.
+`tcpburn` extracts packets from the `80.pcap` file, destined for port 80, and replays them to the target server at **65.135.233.160**, where an application listens on port 80. It replays a total of 10,000 sessions, using client IP addresses from the **62.135.200.x** range. `tcpburn` connects to the assistant server at **10.110.10.161** to obtain response information.
 
 
 ## Note
