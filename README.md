@@ -112,7 +112,7 @@ You would use the following command:
 
 ## Release History
 + 2014.09  v1.0    TCPBurn released
-+ 2014.09  v1.0    Open source fully uses English
++ 2024.09  v1.0    Open source fully uses English
 
 ## Bugs and Feature Requests
 Have a bug or a feature request? [Please open a new issue](https://github.com/session-replay-tools/tcpburn/issues). Before opening any issue, please search for existing issues.
