@@ -19,7 +19,7 @@ TPCBurn is a replay tool designed specifically for concurrency. It can stress-te
 
 ## Architecture
 
-![1725801330718](images/tcpburn.png)
+![tcpburn](images/tcpburn.png)
 
 Figure 1. Overview of the TCPBurn Architecture.
 
